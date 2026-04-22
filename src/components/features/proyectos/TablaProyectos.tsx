@@ -1,6 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { format, isWithinInterval, startOfDay, endOfDay } from "date-fns";
+import { es } from "date-fns/locale";
+import { CalendarIcon, X } from "lucide-react";
+import type { DateRange } from "react-day-picker";
 import {
   flexRender,
   getCoreRowModel,
@@ -18,7 +22,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+import { cn } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -40,11 +53,25 @@ export function TablaProyectos({ data, isOwner }: Props) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   const columns = getColumnasProyectos(isOwner);
 
+  const filteredData = useMemo(() => {
+    if (!dateRange?.from) return data;
+    return data.filter((d) => {
+      if (!d.fechaCompromiso) return false;
+      const dDate = new Date(d.fechaCompromiso);
+      
+      const isAfterStart = dDate >= startOfDay(dateRange.from!);
+      const isBeforeEnd = dateRange.to ? dDate <= endOfDay(dateRange.to) : true;
+      
+      return isAfterStart && isBeforeEnd;
+    });
+  }, [data, dateRange]);
+
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     state: { sorting, columnFilters, globalFilter },
     onSortingChange: setSorting,
@@ -65,6 +92,57 @@ export function TablaProyectos({ data, isOwner }: Props) {
           onChange={(e) => setGlobalFilter(e.target.value)}
           className="max-w-sm h-9"
         />
+        
+        <div className="flex items-center gap-2">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                id="date"
+                variant={"outline"}
+                className={cn(
+                  "w-[260px] justify-start text-left font-normal h-9",
+                  !dateRange && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {dateRange?.from ? (
+                  dateRange.to ? (
+                    <>
+                      {format(dateRange.from, "LLL dd, y", { locale: es })} -{" "}
+                      {format(dateRange.to, "LLL dd, y", { locale: es })}
+                    </>
+                  ) : (
+                    format(dateRange.from, "LLL dd, y", { locale: es })
+                  )
+                ) : (
+                  <span>Filtrar por fecha compromiso</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                initialFocus
+                mode="range"
+                defaultMonth={dateRange?.from}
+                selected={dateRange}
+                onSelect={setDateRange}
+                numberOfMonths={2}
+                locale={es}
+              />
+            </PopoverContent>
+          </Popover>
+          {dateRange?.from && (
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="h-9 w-9 text-gray-500 hover:text-gray-900" 
+              onClick={() => setDateRange(undefined)}
+              title="Limpiar fechas"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
         <Select
           onValueChange={(v) =>
             table
