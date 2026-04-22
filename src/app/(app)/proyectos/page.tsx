@@ -5,10 +5,10 @@ import { TablaProyectos } from "@/components/features/proyectos/TablaProyectos";
 import { NuevoProyectoSheet } from "@/components/features/proyectos/NuevoProyectoSheet";
 
 export default async function ProyectosPage() {
-  const [proyectos, clientes, owner] = await Promise.all([
-    listarProyectos(),
+  const owner = await isOwner();
+  const [proyectos, clientes] = await Promise.all([
+    listarProyectos({}, owner),
     listarClientesSelect(),
-    isOwner(),
   ]);
 
   return (

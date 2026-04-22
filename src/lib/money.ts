@@ -20,21 +20,31 @@ export function restar(a: Decimal | string | number, b: Decimal | string | numbe
 
 export function calcularAvanceMueble(
   procesoActual: string | null | undefined,
-  estadoTareaActual: string | null | undefined
+  tareaCompletada: boolean | null | undefined
 ): number {
   if (!procesoActual) return 0;
 
-  const esOK = estadoTareaActual === "OK";
+  const completo = tareaCompletada === true;
 
   switch (procesoActual) {
     case "HABILITADO":
-      return esOK ? 30 : 20;
+      return completo ? 15 : 10;
     case "ARMADO":
-      return esOK ? 55 : 45;
+      return completo ? 30 : 25;
     case "PULIDO":
-      return esOK ? 80 : 70;
+      return completo ? 45 : 40;
     case "LACA":
-      return esOK ? 100 : 90;
+      return completo ? 60 : 55;
+    case "EXTERNO":
+      return completo ? 70 : 65;
+    case "COMPLEMENTOS":
+      return completo ? 80 : 75;
+    case "EMPAQUE":
+      return completo ? 90 : 85;
+    case "LISTO_PARA_ENTREGA":
+      return 95;
+    case "ENTREGADO":
+      return 100;
     default:
       return 0;
   }

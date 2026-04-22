@@ -240,14 +240,6 @@ export function HeaderProyecto({ proyecto, isOwner }: Props) {
             </p>
           </div>
         )}
-        {isOwner && proyecto.anticipo && (
-          <div>
-            <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Anticipo</p>
-            <p className="font-medium tabular-nums">
-              {formatMXN(proyecto.anticipo.toString())}
-            </p>
-          </div>
-        )}
         <div>
           <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Ítems</p>
           <p className="font-medium">{proyecto.qtyItems}</p>

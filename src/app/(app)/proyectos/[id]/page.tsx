@@ -21,10 +21,8 @@ export default async function ProyectoDetallePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [proyecto, owner] = await Promise.all([
-    obtenerProyecto(id),
-    isOwner(),
-  ]);
+  const owner = await isOwner();
+  const proyecto = await obtenerProyecto(id, owner);
 
   if (!proyecto) notFound();
 
@@ -64,7 +62,7 @@ export default async function ProyectoDetallePage({
         </TabsContent>
 
         <TabsContent value="compras" className="mt-4">
-          <TabCompras compras={proyecto.compras} />
+          <TabCompras compras={proyecto.compras} isOwner={owner} />
         </TabsContent>
 
         {owner && (

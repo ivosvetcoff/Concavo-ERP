@@ -8,7 +8,7 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// ===== USUARIOS Y AUTH =====
+// ===== USUARIOS =====
 
 model User {
   id              String             @id @default(cuid())
@@ -30,25 +30,50 @@ enum Role {
   ENCARGADO
 }
 
-// ===== PERSONAS =====
+// ===== EMPLEADOS (operadores del taller, sin login) =====
 
 model Empleado {
-  id            String       @id @default(cuid())
-  nombre        String
-  apellido      String?
-  puesto        String?
-  tarifaHora    Decimal?     @db.Decimal(10, 2)
-  sueldoMensual Decimal?     @db.Decimal(12, 2)
-  fechaIngreso  DateTime?
-  activo        Boolean      @default(true)
-  color         String?      // hex para Gantt, ej: "#4F46E5"
-  rfc           String?      // para recibos de nómina (futuro)
-  nss           String?      // Número de Seguro Social IMSS
-  tareas        Tarea[]
-  pagosNomina   PagoNomina[]
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  id               String               @id @default(cuid())
+  nombre           String
+  apellido         String?
+  especialidad     EspecialidadEmpleado
+  tarifaHoraTO     Decimal              @db.Decimal(10, 2)
+  tarifaHoraTE     Decimal              @db.Decimal(10, 2)
+  sueldoSemanal    Decimal?             @db.Decimal(12, 2)
+  fechaIngreso     DateTime?
+  activo           Boolean              @default(true)
+  color            String?
+  rfc              String?
+  nss              String?
+  tareas           Tarea[]
+  registros        RegistroProduccion[]
+  pagosNomina      PagoNomina[]
+  historialTarifas HistorialTarifa[]
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
 }
+
+enum EspecialidadEmpleado {
+  HABILITADOR
+  ARMADOR
+  PULIDOR
+  LAQUEADOR
+  ADMINISTRATIVO
+}
+
+model HistorialTarifa {
+  id           String    @id @default(cuid())
+  empleadoId   String
+  empleado     Empleado  @relation(fields: [empleadoId], references: [id], onDelete: Cascade)
+  tarifaHoraTO Decimal   @db.Decimal(10, 2)
+  tarifaHoraTE Decimal   @db.Decimal(10, 2)
+  vigenteDesde DateTime
+  vigenteHasta DateTime?
+
+  @@index([empleadoId, vigenteDesde])
+}
+
+// ===== CLIENTES =====
 
 model Cliente {
   id             String     @id @default(cuid())
@@ -56,9 +81,9 @@ model Cliente {
   contacto       String?
   telefono       String?
   email          String?
-  rfc            String?    // opcional: algunos pagan en efectivo sin RFC
-  razonSocial    String?    // si factura a persona moral
-  usoCFDIDefault String?    // clave SAT: G03, P01, etc.
+  rfc            String?
+  razonSocial    String?
+  usoCFDIDefault String?
   notas          String?
   proyectos      Proyecto[]
   createdAt      DateTime   @default(now())
@@ -67,32 +92,13 @@ model Cliente {
   @@index([rfc])
 }
 
-// ===== CATÁLOGO DE MODELOS DE MUEBLE =====
-
-model ModeloMueble {
-  id              String   @id @default(cuid())
-  codigo          String   @unique
-  nombre          String
-  linea           String?  // "VILNA", "HYGGE", "PEDREGAL"
-  descripcionBase String?
-  maderaTipica    String?
-  horasEstimadas  Decimal? @db.Decimal(6, 2)
-  activo          Boolean  @default(true)
-  muebles         Mueble[]
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  @@index([linea])
-  @@index([activo])
-}
-
-// ===== NÚCLEO: PROYECTOS, ENTREGAS Y MUEBLES =====
+// ===== PROYECTOS =====
 
 model Proyecto {
   id              String             @id @default(cuid())
-  codigo          String             @unique // "017", "058" — correlativo con padding
+  codigo          String             @unique
   nombre          String
-  po              String?            // purchase order del cliente
+  po              String?
   clienteId       String
   cliente         Cliente            @relation(fields: [clienteId], references: [id])
   estado          EstadoProyecto     @default(COTIZACION)
@@ -103,24 +109,24 @@ model Proyecto {
   fechaEntrega    DateTime?
   qtyItems        Int                @default(0)
   montoVendido    Decimal            @db.Decimal(12, 2)
-  anticipo        Decimal?           @db.Decimal(12, 2)
+  ivaIncluido     Boolean            @default(true)
   moneda          Moneda             @default(MXN)
-  tipoCambioVenta Decimal?           @db.Decimal(12, 4) // latente, solo si moneda != MXN
+  tipoCambioVenta Decimal?           @db.Decimal(12, 4)
   tieneHC         Boolean            @default(false)
   comentarios     String?
 
-  // Facturación CFDI — solo visible para OWNER
   facturado        Boolean     @default(false)
-  numeroCFDI       String?     // UUID o folio del CFDI emitido
-  rfcCliente       String?     // RFC usado en el CFDI (puede diferir del Cliente master)
-  usoCFDI          String?     // clave SAT: G03, P01, etc.
-  metodoPago       MetodoPago? // PUE / PPD
-  formaPago        String?     // clave SAT: 01 efectivo, 03 transferencia, 04 tarjeta
+  numeroCFDI       String?
+  rfcCliente       String?
+  usoCFDI          String?
+  metodoPago       MetodoPago?
+  formaPago        String?
   fechaFacturacion DateTime?
 
-  entregas   Entrega[]
   muebles    Mueble[]
   compras    Compra[]
+  anticipos  Anticipo[]
+  pagos      PagoProyecto[]
   revisiones ProyectoRevision[]
   eventos    EventoProyecto[]
   createdAt  DateTime           @default(now())
@@ -129,6 +135,7 @@ model Proyecto {
   @@index([estado])
   @@index([clienteId])
   @@index([fechaCompromiso])
+  @@index([fechaEntrega])
   @@index([facturado])
 }
 
@@ -160,57 +167,53 @@ enum Moneda {
 }
 
 enum MetodoPago {
-  PUE // Pago en Una sola Exhibición
-  PPD // Pago en Parcialidades o Diferido
+  PUE
+  PPD
 }
 
-// ===== ENTREGA — pendiente confirmación Fase 0 =====
-// Se incluye en el schema pero no se activa en UI hasta confirmar con cliente
-// (ver decisión abierta #1 en CLAUDE.md sección 16)
-
-model Entrega {
-  id              String         @id @default(cuid())
-  proyectoId      String
-  proyecto        Proyecto       @relation(fields: [proyectoId], references: [id], onDelete: Cascade)
-  nombre          String
-  fechaCompromiso DateTime
-  fechaEntrega    DateTime?
-  estado          EstadoProyecto @default(FABRICACION)
-  muebles         Mueble[]
-  orden           Int            @default(0)
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-
-  @@index([proyectoId])
-  @@index([fechaCompromiso])
-}
+// ===== MUEBLES =====
 
 model Mueble {
   id               String             @id @default(cuid())
   proyectoId       String
   proyecto         Proyecto           @relation(fields: [proyectoId], references: [id], onDelete: Cascade)
-  entregaId        String?
-  entrega          Entrega?           @relation(fields: [entregaId], references: [id])
-  modeloId         String?
-  modelo           ModeloMueble?      @relation(fields: [modeloId], references: [id])
   orden            String?
   nombre           String
   cantidad         Int                @default(1)
   madera           String?
+  estructura       Estructura?
+  monto            Decimal?           @db.Decimal(12, 2)
   descripcionLarga String?
   terceros         TipoTercero[]
   notasTerceros    String?
+  estadoItem       EstadoItem         @default(ESPERA)
   procesoActual    ProcesoTecnico?
   especificaciones Json?
   historialProceso MuebleProcesoLog[]
   tareas           Tarea[]
+  registros        RegistroProduccion[]
+  costosExternos   CostoExterno[]
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
 
   @@index([proyectoId])
-  @@index([entregaId])
+  @@index([estadoItem])
   @@index([procesoActual])
-  @@index([modeloId])
+}
+
+enum Estructura {
+  MDF
+  PTR
+  NA
+}
+
+enum EstadoItem {
+  ESPERA
+  FABRICACION
+  REPROCESO
+  PAUSA
+  CANCELADO
+  ENTREGADO
 }
 
 enum ProcesoTecnico {
@@ -218,6 +221,11 @@ enum ProcesoTecnico {
   ARMADO
   PULIDO
   LACA
+  EXTERNO
+  COMPLEMENTOS
+  EMPAQUE
+  LISTO_PARA_ENTREGA
+  ENTREGADO
 }
 
 enum TipoTercero {
@@ -225,6 +233,10 @@ enum TipoTercero {
   PIEL
   ACCESORIOS
   HERRERIA
+  MARMOL
+  ESPEJO
+  TEJIDO
+  OTROS
 }
 
 model MuebleProcesoLog {
@@ -233,9 +245,73 @@ model MuebleProcesoLog {
   mueble          Mueble          @relation(fields: [muebleId], references: [id], onDelete: Cascade)
   procesoAnterior ProcesoTecnico?
   procesoNuevo    ProcesoTecnico?
+  estadoAnterior  EstadoItem?
+  estadoNuevo     EstadoItem?
   cambiadoPorId   String?
   fecha           DateTime        @default(now())
 
+  @@index([muebleId])
+}
+
+model CostoExterno {
+  id          String      @id @default(cuid())
+  muebleId    String
+  mueble      Mueble      @relation(fields: [muebleId], references: [id], onDelete: Cascade)
+  tipo        TipoTercero
+  proveedor   String?
+  monto       Decimal     @db.Decimal(12, 2)
+  ivaIncluido Boolean     @default(false)
+  fecha       DateTime
+  comprobante String?
+  notas       String?
+  createdAt   DateTime    @default(now())
+
+  @@index([muebleId])
+  @@index([tipo])
+}
+
+// ===== TAREAS (Gantt) =====
+
+model Tarea {
+  id             String         @id @default(cuid())
+  muebleId       String
+  mueble         Mueble         @relation(fields: [muebleId], references: [id], onDelete: Cascade)
+  empleadoId     String
+  empleado       Empleado       @relation(fields: [empleadoId], references: [id])
+  asignadoPorId  String?
+  asignadoPor    User?          @relation("AsignadoPor", fields: [asignadoPorId], references: [id])
+  proceso        ProcesoTecnico
+  fechaInicio    DateTime
+  fechaFinEst    DateTime
+  fechaFinReal   DateTime?
+  horasEstimadas Decimal?       @db.Decimal(6, 2)
+  completada     Boolean        @default(false)
+  notas          String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([empleadoId, fechaInicio])
+  @@index([muebleId])
+}
+
+// ===== REGISTRO DE PRODUCCIÓN =====
+
+model RegistroProduccion {
+  id         String         @id @default(cuid())
+  empleadoId String
+  empleado   Empleado       @relation(fields: [empleadoId], references: [id])
+  muebleId   String
+  mueble     Mueble         @relation(fields: [muebleId], references: [id], onDelete: Cascade)
+  proceso    ProcesoTecnico
+  semana     DateTime
+  horasTO    Decimal        @db.Decimal(6, 2) @default(0)
+  horasTE    Decimal        @db.Decimal(6, 2) @default(0)
+  notas      String?
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  @@unique([empleadoId, muebleId, proceso, semana])
+  @@index([semana])
   @@index([muebleId])
 }
 
@@ -275,116 +351,231 @@ enum TipoEvento {
   CAMBIO_MONTO
   MUEBLE_AGREGADO
   MUEBLE_ELIMINADO
-  ENTREGA_AGREGADA
+  CAMBIO_PROCESO
+  ANTICIPO_RECIBIDO
+  PAGO_RECIBIDO
   COMPRA_REGISTRADA
   FACTURADO
   COMENTARIO
   OTRO
 }
 
-// ===== TIPOS DE CAMBIO — latente para multi-moneda futura =====
+// ===== COMPRAS =====
+
+model Compra {
+  id                 String          @id @default(cuid())
+  fecha              DateTime
+  categoria          CategoriaCompra
+  tipo               TipoCompra
+  clienteRelacionado String?
+  proyectoId         String?
+  proyecto           Proyecto?       @relation(fields: [proyectoId], references: [id])
+  muebleNombre       String?
+  descripcion        String
+  proveedor          String
+  idFactura          String?
+  qty                Decimal         @db.Decimal(10, 3)
+  unidad             UnidadCompra
+  importe            Decimal         @db.Decimal(12, 2)
+  iva                Decimal         @db.Decimal(12, 2) @default(0)
+  total              Decimal         @db.Decimal(12, 2)
+  metodoPago         String
+  numeroCFDIRecibido String?
+  rfcProveedor       String?
+  comprobante        String?
+  createdAt          DateTime        @default(now())
+
+  @@index([proyectoId])
+  @@index([fecha])
+  @@index([categoria])
+  @@index([tipo])
+}
+
+enum CategoriaCompra {
+  MDF
+  SOLIDO
+  COMPLEMENTOS
+  ENVIOS
+}
+
+enum TipoCompra {
+  INICIAL
+  ADICIONAL
+}
+
+enum UnidadCompra {
+  HOJA
+  PIE_TABLA
+  PIEZA
+  METRO
+  PEDIDO
+  ENVIO
+  KILOGRAMO
+  LITRO
+  PAQUETE
+  JUEGO
+  GALON
+  CAJA
+  CM
+  ROLLO
+  RECOLECCION
+  GRUPO
+}
+
+// ===== INSUMOS GENERALES =====
+
+model Insumo {
+  id          String       @id @default(cuid())
+  fecha       DateTime
+  descripcion String
+  proveedor   String
+  idFactura   String?
+  qty         Decimal      @db.Decimal(10, 3)
+  unidad      UnidadCompra
+  importe     Decimal      @db.Decimal(12, 2)
+  iva         Decimal      @db.Decimal(12, 2) @default(0)
+  total       Decimal      @db.Decimal(12, 2)
+  metodoPago  String
+  categoria   String?
+  createdAt   DateTime     @default(now())
+
+  @@index([fecha])
+}
+
+// ===== GASTOS FIJOS MENSUALES =====
+
+model GastoFijo {
+  id        String            @id @default(cuid())
+  mes       Int
+  anio      Int
+  concepto  ConceptoGastoFijo
+  monto     Decimal           @db.Decimal(12, 2)
+  pagado    Boolean           @default(false)
+  fechaPago DateTime?
+  notas     String?
+  createdAt DateTime          @default(now())
+
+  @@unique([mes, anio, concepto])
+  @@index([anio, mes])
+}
+
+enum ConceptoGastoFijo {
+  RENTA
+  LUZ
+  AGUA
+  MANTENIMIENTO
+  INTERNET
+  GASOLINA
+  GASTOS_VARIOS
+  IMSS
+  CONTADOR
+  IMPUESTOS
+  MAQUINARIA_Y_EQUIPO
+  OTROS
+}
+
+// ===== ANTICIPOS =====
+
+model Anticipo {
+  id         String   @id @default(cuid())
+  proyectoId String
+  proyecto   Proyecto @relation(fields: [proyectoId], references: [id], onDelete: Cascade)
+  monto      Decimal  @db.Decimal(12, 2)
+  porcentaje Decimal? @db.Decimal(5, 2)
+  fecha      DateTime
+  metodoPago String
+  cfdiEmitido Boolean  @default(false)
+  numeroCFDI String?
+  notas      String?
+  createdAt  DateTime @default(now())
+
+  @@index([proyectoId])
+  @@index([fecha])
+}
+
+// ===== PAGO PROYECTO =====
+
+model PagoProyecto {
+  id         String      @id @default(cuid())
+  proyectoId String
+  proyecto   Proyecto    @relation(fields: [proyectoId], references: [id], onDelete: Cascade)
+  monto      Decimal     @db.Decimal(12, 2)
+  fecha      DateTime
+  metodoPago String
+  estatus    EstatusPago @default(PENDIENTE)
+  cfdiEmitido Boolean    @default(false)
+  numeroCFDI String?
+  notas      String?
+  createdAt  DateTime    @default(now())
+
+  @@index([proyectoId])
+  @@index([estatus])
+}
+
+enum EstatusPago {
+  PENDIENTE
+  LIQUIDADO
+  CANCELADO
+}
+
+// ===== NÓMINA SEMANAL =====
+
+model PagoNomina {
+  id          String    @id @default(cuid())
+  empleadoId  String
+  empleado    Empleado  @relation(fields: [empleadoId], references: [id])
+  semana      DateTime
+  sueldoBase  Decimal   @db.Decimal(12, 2)
+  horasExtras Decimal   @db.Decimal(6, 2) @default(0)
+  montoExtras Decimal   @db.Decimal(12, 2) @default(0)
+  bonos       Decimal   @db.Decimal(12, 2) @default(0)
+  deducciones Decimal   @db.Decimal(12, 2) @default(0)
+  total       Decimal   @db.Decimal(12, 2)
+  pagado      Boolean   @default(false)
+  fechaPago   DateTime?
+  notas       String?
+  createdAt   DateTime  @default(now())
+
+  @@unique([empleadoId, semana])
+  @@index([semana])
+}
+
+// ===== CIERRE MENSUAL =====
+
+model CierreMensual {
+  id                       String    @id @default(cuid())
+  mes                      Int
+  anio                     Int
+  cerrado                  Boolean   @default(false)
+  fechaCierre              DateTime?
+  cerradoPorId             String?
+
+  totalProyectosEntregados Int     @default(0)
+  totalItemsEntregados     Int     @default(0)
+  totalIngresosFacturados  Decimal @db.Decimal(14, 2) @default(0)
+  totalIngresosEfectivo    Decimal @db.Decimal(14, 2) @default(0)
+  totalIngresos            Decimal @db.Decimal(14, 2) @default(0)
+  totalInsumos             Decimal @db.Decimal(14, 2) @default(0)
+  totalMOI                 Decimal @db.Decimal(14, 2) @default(0)
+  totalGastosFijos         Decimal @db.Decimal(14, 2) @default(0)
+  totalUtilidadProyectos   Decimal @db.Decimal(14, 2) @default(0)
+  utilidadNetaMes          Decimal @db.Decimal(14, 2) @default(0)
+
+  snapshotProyectos Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([mes, anio])
+}
+
+// ===== TIPOS DE CAMBIO =====
 
 model TipoCambio {
   id     String   @id @default(cuid())
   fecha  DateTime @unique
-  mxnUsd Decimal  @db.Decimal(12, 4) // 1 USD = X MXN
-  fuente String?  // "Banxico FIX", "manual"
+  mxnUsd Decimal  @db.Decimal(12, 4)
+  fuente String?
 
   @@index([fecha])
-}
-
-// ===== TAREAS =====
-
-model Tarea {
-  id             String         @id @default(cuid())
-  muebleId       String
-  mueble         Mueble         @relation(fields: [muebleId], references: [id], onDelete: Cascade)
-  empleadoId     String
-  empleado       Empleado       @relation(fields: [empleadoId], references: [id])
-  asignadoPorId  String?
-  asignadoPor    User?          @relation("AsignadoPor", fields: [asignadoPorId], references: [id])
-  proceso        ProcesoTecnico
-  estado         EstadoTarea    @default(PENDIENTE)
-  fechaInicio    DateTime
-  fechaFinEst    DateTime
-  fechaFinReal   DateTime?
-  horasEstimadas Decimal?       @db.Decimal(6, 2)
-  horasReales    Decimal?       @db.Decimal(6, 2)
-  notas          String?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-
-  @@index([empleadoId, fechaInicio])
-  @@index([muebleId])
-  @@index([estado])
-}
-
-enum EstadoTarea {
-  PENDIENTE
-  EN_PROCESO
-  PAUSA
-  OK
-  RETRABAJO
-  RE_TRABAJO
-}
-
-// ===== FINANZAS =====
-
-model Compra {
-  id                 String     @id @default(cuid())
-  fecha              DateTime
-  proveedor          String
-  descripcion        String
-  monto              Decimal    @db.Decimal(12, 2)
-  moneda             Moneda     @default(MXN)
-  tipoCambio         Decimal?   @db.Decimal(12, 4) // solo si moneda != MXN
-  tipo               TipoCompra
-  proyectoId         String?
-  proyecto           Proyecto?  @relation(fields: [proyectoId], references: [id])
-  categoria          String?
-  comprobante        String?    // URL al archivo (Fase 2)
-  numeroCFDIRecibido String?    // UUID del CFDI emitido por el proveedor
-  rfcProveedor       String?
-  createdAt          DateTime   @default(now())
-  updatedAt          DateTime   @updatedAt
-
-  @@index([proyectoId])
-  @@index([fecha])
-  @@index([tipo])
-}
-
-enum TipoCompra {
-  PROYECTO
-  GENERAL
-}
-
-model GastoOperativo {
-  id         String   @id @default(cuid())
-  fecha      DateTime
-  concepto   String
-  monto      Decimal  @db.Decimal(12, 2)
-  moneda     Moneda   @default(MXN)
-  categoria  String
-  recurrente Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  @@index([fecha])
-}
-
-model PagoNomina {
-  id         String    @id @default(cuid())
-  empleadoId String
-  empleado   Empleado  @relation(fields: [empleadoId], references: [id])
-  mes        Int
-  anio       Int
-  monto      Decimal   @db.Decimal(12, 2)
-  pagado     Boolean   @default(false)
-  fechaPago  DateTime?
-  notas      String?
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-
-  @@unique([empleadoId, mes, anio])
-  @@index([anio, mes])
 }

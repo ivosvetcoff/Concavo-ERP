@@ -16,9 +16,10 @@ export type ProyectoRow = {
   estado: EstadoProyecto;
   semaforo: Semaforo;
   tieneHC: boolean;
-  facturado: boolean;
   comentarios: string | null;
-  montoVendido: string;
+  // OWNER-only (null para ENCARGADO)
+  montoVendido: string | null;
+  facturado: boolean | null;
 };
 
 export type FiltrosProyectos = {
@@ -28,7 +29,8 @@ export type FiltrosProyectos = {
 };
 
 export async function listarProyectos(
-  filtros: FiltrosProyectos = {}
+  filtros: FiltrosProyectos = {},
+  owner = false
 ): Promise<ProyectoRow[]> {
   const { estado, semaforo, busqueda } = filtros;
 
@@ -59,9 +61,9 @@ export async function listarProyectos(
       estado: true,
       semaforo: true,
       tieneHC: true,
-      facturado: true,
       comentarios: true,
       montoVendido: true,
+      facturado: true,
       cliente: { select: { nombre: true } },
     },
     orderBy: [{ codigo: "desc" }],
@@ -70,6 +72,7 @@ export async function listarProyectos(
   return proyectos.map((p) => ({
     ...p,
     cliente: p.cliente.nombre,
-    montoVendido: p.montoVendido.toString(),
+    montoVendido: owner ? p.montoVendido.toString() : null,
+    facturado: owner ? p.facturado : null,
   }));
 }

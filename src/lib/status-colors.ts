@@ -1,4 +1,4 @@
-import type { EstadoProyecto, Semaforo, EstadoTarea, ProcesoTecnico } from "@prisma/client";
+import type { EstadoProyecto, Semaforo, ProcesoTecnico, EstadoItem } from "@prisma/client";
 
 // ===== SEMÁFORO =====
 
@@ -116,6 +116,31 @@ export const procesoTecnicoConfig: Record<
     orden: 4,
     badge: "bg-pink-100 text-pink-700 border-pink-200",
   },
+  EXTERNO: {
+    label: "Externo",
+    orden: 5,
+    badge: "bg-orange-100 text-orange-700 border-orange-200",
+  },
+  COMPLEMENTOS: {
+    label: "Complementos",
+    orden: 6,
+    badge: "bg-teal-100 text-teal-700 border-teal-200",
+  },
+  EMPAQUE: {
+    label: "Empaque",
+    orden: 7,
+    badge: "bg-cyan-100 text-cyan-700 border-cyan-200",
+  },
+  LISTO_PARA_ENTREGA: {
+    label: "Listo p/ entrega",
+    orden: 8,
+    badge: "bg-lime-100 text-lime-700 border-lime-200",
+  },
+  ENTREGADO: {
+    label: "Entregado",
+    orden: 9,
+    badge: "bg-green-100 text-green-700 border-green-200",
+  },
 };
 
 export const PROCESOS_ORDENADOS: ProcesoTecnico[] = [
@@ -123,36 +148,38 @@ export const PROCESOS_ORDENADOS: ProcesoTecnico[] = [
   "ARMADO",
   "PULIDO",
   "LACA",
+  "EXTERNO",
+  "COMPLEMENTOS",
+  "EMPAQUE",
+  "LISTO_PARA_ENTREGA",
+  "ENTREGADO",
 ];
 
-// ===== ESTADO TAREA =====
+// ===== ESTADO ÍTEM =====
 
-export const estadoTareaConfig: Record<
-  EstadoTarea,
-  { label: string; badge: string }
-> = {
-  PENDIENTE: {
-    label: "Pendiente",
+export const estadoItemConfig: Record<EstadoItem, { label: string; badge: string }> = {
+  ESPERA: {
+    label: "En espera",
     badge: "bg-gray-100 text-gray-600 border-gray-200",
   },
-  EN_PROCESO: {
-    label: "En proceso",
+  FABRICACION: {
+    label: "Fabricación",
     badge: "bg-blue-100 text-blue-700 border-blue-200",
+  },
+  REPROCESO: {
+    label: "Reproceso",
+    badge: "bg-red-100 text-red-600 border-red-200",
   },
   PAUSA: {
     label: "Pausa",
     badge: "bg-yellow-100 text-yellow-700 border-yellow-200",
   },
-  OK: {
-    label: "OK",
+  CANCELADO: {
+    label: "Cancelado",
+    badge: "bg-gray-200 text-gray-500 border-gray-300",
+  },
+  ENTREGADO: {
+    label: "Entregado",
     badge: "bg-green-100 text-green-700 border-green-200",
-  },
-  RETRABAJO: {
-    label: "Retrabajo",
-    badge: "bg-red-100 text-red-600 border-red-200",
-  },
-  RE_TRABAJO: {
-    label: "Re-trabajo",
-    badge: "bg-orange-100 text-orange-700 border-orange-200",
   },
 };

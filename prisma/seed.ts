@@ -9,37 +9,27 @@ async function main() {
   const cliente1 = await prisma.cliente.upsert({
     where: { id: "seed-cliente-syg" },
     update: {},
-    create: {
-      id: "seed-cliente-syg",
-      nombre: "SYG",
-      contacto: "Contacto SYG",
-      telefono: "3310000001",
-    },
+    create: { id: "seed-cliente-syg", nombre: "SYG", telefono: "3310000001" },
   });
-
   const cliente2 = await prisma.cliente.upsert({
     where: { id: "seed-cliente-aagnes" },
     update: {},
-    create: {
-      id: "seed-cliente-aagnes",
-      nombre: "AAGNES",
-      telefono: "3310000002",
-    },
+    create: { id: "seed-cliente-aagnes", nombre: "AAGNES", telefono: "3310000002" },
   });
-
   const cliente3 = await prisma.cliente.upsert({
     where: { id: "seed-cliente-trra" },
     update: {},
-    create: {
-      id: "seed-cliente-trra",
-      nombre: "TRRA",
-      telefono: "3310000003",
-    },
+    create: { id: "seed-cliente-trra", nombre: "TRRA", telefono: "3310000003" },
+  });
+  const cliente4 = await prisma.cliente.upsert({
+    where: { id: "seed-cliente-rts" },
+    update: {},
+    create: { id: "seed-cliente-rts", nombre: "RTS", telefono: "3310000004" },
   });
 
-  console.log(`Clientes creados: ${cliente1.nombre}, ${cliente2.nombre}, ${cliente3.nombre}`);
+  console.log(`Clientes: ${[cliente1, cliente2, cliente3, cliente4].map((c) => c.nombre).join(", ")}`);
 
-  // Empleados
+  // Empleados — tarifas de septiembre 2025 del Master Administrativo
   const empleados = await Promise.all([
     prisma.empleado.upsert({
       where: { id: "seed-emp-pepe" },
@@ -47,7 +37,10 @@ async function main() {
       create: {
         id: "seed-emp-pepe",
         nombre: "Pepe",
-        puesto: "Carpintero",
+        especialidad: "HABILITADOR",
+        tarifaHoraTO: "66.67",
+        tarifaHoraTE: "133.34",
+        sueldoSemanal: "2000.00",
         activo: true,
         color: "#4F46E5",
       },
@@ -58,7 +51,10 @@ async function main() {
       create: {
         id: "seed-emp-marisol",
         nombre: "Marisol",
-        puesto: "Carpintero",
+        especialidad: "HABILITADOR",
+        tarifaHoraTO: "66.67",
+        tarifaHoraTE: "133.34",
+        sueldoSemanal: "2000.00",
         activo: true,
         color: "#059669",
       },
@@ -69,7 +65,10 @@ async function main() {
       create: {
         id: "seed-emp-cristian",
         nombre: "Cristian",
-        puesto: "Carpintero",
+        especialidad: "ARMADOR",
+        tarifaHoraTO: "73.33",
+        tarifaHoraTE: "146.66",
+        sueldoSemanal: "2200.00",
         activo: true,
         color: "#D97706",
       },
@@ -80,7 +79,10 @@ async function main() {
       create: {
         id: "seed-emp-beto",
         nombre: "Beto",
-        puesto: "Carpintero",
+        especialidad: "ARMADOR",
+        tarifaHoraTO: "77.78",
+        tarifaHoraTE: "155.56",
+        sueldoSemanal: "2400.00",
         activo: true,
         color: "#DC2626",
       },
@@ -91,55 +93,75 @@ async function main() {
       create: {
         id: "seed-emp-chava",
         nombre: "Chava",
-        puesto: "Carpintero",
+        especialidad: "ARMADOR",
+        tarifaHoraTO: "73.33",
+        tarifaHoraTE: "146.66",
+        sueldoSemanal: "2200.00",
         activo: true,
         color: "#7C3AED",
       },
     }),
+    prisma.empleado.upsert({
+      where: { id: "seed-emp-ramon" },
+      update: {},
+      create: {
+        id: "seed-emp-ramon",
+        nombre: "Ramón",
+        especialidad: "ARMADOR",
+        tarifaHoraTO: "88.89",
+        tarifaHoraTE: "177.78",
+        sueldoSemanal: "2700.00",
+        activo: true,
+        color: "#0891B2",
+      },
+    }),
+    prisma.empleado.upsert({
+      where: { id: "seed-emp-suli" },
+      update: {},
+      create: {
+        id: "seed-emp-suli",
+        nombre: "Suli",
+        especialidad: "PULIDOR",
+        tarifaHoraTO: "60.00",
+        tarifaHoraTE: "120.00",
+        sueldoSemanal: "1800.00",
+        activo: true,
+        color: "#BE185D",
+      },
+    }),
+    prisma.empleado.upsert({
+      where: { id: "seed-emp-jona" },
+      update: {},
+      create: {
+        id: "seed-emp-jona",
+        nombre: "Jona",
+        especialidad: "PULIDOR",
+        tarifaHoraTO: "60.00",
+        tarifaHoraTE: "120.00",
+        sueldoSemanal: "1800.00",
+        activo: true,
+        color: "#65A30D",
+      },
+    }),
+    prisma.empleado.upsert({
+      where: { id: "seed-emp-citla" },
+      update: {},
+      create: {
+        id: "seed-emp-citla",
+        nombre: "Citla",
+        especialidad: "LAQUEADOR",
+        tarifaHoraTO: "73.33",
+        tarifaHoraTE: "146.66",
+        sueldoSemanal: "2200.00",
+        activo: true,
+        color: "#EA580C",
+      },
+    }),
   ]);
 
-  console.log(`Empleados creados: ${empleados.map((e) => e.nombre).join(", ")}`);
+  console.log(`Empleados: ${empleados.map((e) => e.nombre).join(", ")}`);
 
-  // Catálogo de modelos
-  const modelos = await Promise.all([
-    prisma.modeloMueble.upsert({
-      where: { codigo: "CAM-VLN-25" },
-      update: {},
-      create: {
-        codigo: "CAM-VLN-25",
-        nombre: "CAMA VILNA 25 KS",
-        linea: "VILNA",
-        maderaTipica: "NOGAL",
-        activo: true,
-      },
-    }),
-    prisma.modeloMueble.upsert({
-      where: { codigo: "MES-HYG-01" },
-      update: {},
-      create: {
-        codigo: "MES-HYG-01",
-        nombre: "MESA HYGGE",
-        linea: "HYGGE",
-        maderaTipica: "PAROTA",
-        activo: true,
-      },
-    }),
-    prisma.modeloMueble.upsert({
-      where: { codigo: "COM-PDG-01" },
-      update: {},
-      create: {
-        codigo: "COM-PDG-01",
-        nombre: "COMODA PEDREGAL",
-        linea: "PEDREGAL",
-        maderaTipica: "ROSAMORADA",
-        activo: true,
-      },
-    }),
-  ]);
-
-  console.log(`Modelos creados: ${modelos.map((m) => m.nombre).join(", ")}`);
-
-  // Proyecto de ejemplo
+  // Proyecto de muestra
   const proyecto = await prisma.proyecto.upsert({
     where: { codigo: "058" },
     update: {},
@@ -150,6 +172,7 @@ async function main() {
       estado: "FABRICACION",
       semaforo: "EN_TIEMPO",
       montoVendido: "185000.00",
+      ivaIncluido: true,
       moneda: "MXN",
       tieneHC: true,
       qtyItems: 3,
@@ -157,7 +180,7 @@ async function main() {
     },
   });
 
-  console.log(`Proyecto creado: ${proyecto.codigo} — ${proyecto.nombre}`);
+  console.log(`Proyecto: ${proyecto.codigo} — ${proyecto.nombre}`);
 
   // Muebles del proyecto
   await Promise.all([
@@ -167,9 +190,11 @@ async function main() {
       create: {
         id: "seed-mueble-1",
         proyectoId: proyecto.id,
-        nombre: "CAMA VILNA 25 KS",
+        nombre: "CAMA PRINCIPAL",
         cantidad: 1,
         madera: "NOGAL",
+        estructura: "MDF",
+        estadoItem: "FABRICACION",
         procesoActual: "ARMADO",
         orden: "1",
       },
@@ -180,9 +205,11 @@ async function main() {
       create: {
         id: "seed-mueble-2",
         proyectoId: proyecto.id,
-        nombre: "BURÓ VILNA",
+        nombre: "BURÓ",
         cantidad: 2,
         madera: "NOGAL",
+        estructura: "MDF",
+        estadoItem: "FABRICACION",
         procesoActual: "HABILITADO",
         orden: "2",
       },
@@ -196,13 +223,15 @@ async function main() {
         nombre: "VESTIDOR",
         cantidad: 1,
         madera: "NOGAL",
+        estructura: "PTR",
+        estadoItem: "ESPERA",
         procesoActual: null,
         orden: "3",
       },
     }),
   ]);
 
-  console.log("Muebles de ejemplo creados.");
+  console.log("Muebles creados.");
   console.log("Seed completado.");
 }
 

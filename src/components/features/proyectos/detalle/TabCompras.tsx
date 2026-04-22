@@ -14,7 +14,7 @@ export function TabCompras({ compras }: { compras: ProyectoDetalle["compras"] })
   }
 
   const total = compras.reduce(
-    (acc, c) => acc + parseFloat(c.monto.toString()),
+    (acc: number, c) => acc + parseFloat(c.total.toString()),
     0
   );
 
@@ -92,7 +92,7 @@ function FilaCompra({ compra }: { compra: Compra }) {
         )}
       </td>
       <td className="py-2.5 px-3 text-right font-medium tabular-nums">
-        {formatMXN(compra.monto.toString())}
+        {formatMXN(compra.total.toString())}
       </td>
     </tr>
   );

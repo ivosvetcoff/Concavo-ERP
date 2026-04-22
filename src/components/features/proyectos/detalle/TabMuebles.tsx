@@ -25,6 +25,10 @@ const tercerosLabel: Record<TipoTercero, string> = {
   PIEL: "Piel",
   ACCESORIOS: "Accs.",
   HERRERIA: "Herrería",
+  MARMOL: "Mármol",
+  ESPEJO: "Espejo",
+  TEJIDO: "Tejido",
+  OTROS: "Otros",
 };
 
 type Mueble = ProyectoDetalle["muebles"][0];
@@ -67,7 +71,7 @@ function FilaMueble({
   const [proceso, setProceso] = useState<string>(mueble.procesoActual ?? "");
   const [cambiando, setCambiando] = useState(false);
 
-  const avance = calcularAvanceMueble(proceso || null, mueble.tareas[0]?.estado);
+  const avance = calcularAvanceMueble(proceso || null, mueble.tareas[0]?.completada);
 
   async function handleCambiarProceso(nuevo: string) {
     if (nuevo === proceso) return;
@@ -116,6 +120,11 @@ function FilaMueble({
           <option value="ARMADO">Armado</option>
           <option value="PULIDO">Pulido</option>
           <option value="LACA">Laca</option>
+          <option value="EXTERNO">Externo</option>
+          <option value="COMPLEMENTOS">Complementos</option>
+          <option value="EMPAQUE">Empaque</option>
+          <option value="LISTO_PARA_ENTREGA">Listo p/ entrega</option>
+          <option value="ENTREGADO">Entregado</option>
         </select>
       </td>
       <td className="py-2.5 px-3 min-w-[120px]">
@@ -163,7 +172,7 @@ export function TabMuebles({
   const [eliminando, setEliminando] = useState(false);
 
   const avances = muebles.map((m) =>
-    calcularAvanceMueble(m.procesoActual, m.tareas[0]?.estado)
+    calcularAvanceMueble(m.procesoActual, m.tareas[0]?.completada)
   );
   const avanceTotal =
     avances.length > 0

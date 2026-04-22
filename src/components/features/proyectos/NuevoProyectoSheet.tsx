@@ -80,11 +80,9 @@ export function NuevoProyectoSheet({ clientes, isOwner }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="gap-2">
-          <Plus className="h-4 w-4" />
-          Nuevo proyecto
-        </Button>
+      <DialogTrigger render={<Button className="gap-2" />}>
+        <Plus className="h-4 w-4" />
+        Nuevo proyecto
       </DialogTrigger>
       <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
@@ -175,34 +173,21 @@ export function NuevoProyectoSheet({ clientes, isOwner }: Props) {
 
               {isOwner && (
                 <>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="montoVendido">
-                        Monto vendido (MXN) <span className="text-red-500">*</span>
-                      </Label>
-                      <Input
-                        id="montoVendido"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        placeholder="0.00"
-                        {...register("montoVendido")}
-                      />
-                      {errors.montoVendido && (
-                        <p className="text-xs text-red-500">{errors.montoVendido.message}</p>
-                      )}
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="anticipo">Anticipo (opc)</Label>
-                      <Input
-                        id="anticipo"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        placeholder="0.00"
-                        {...register("anticipo")}
-                      />
-                    </div>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="montoVendido">
+                      Monto vendido (MXN) <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="montoVendido"
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="0.00"
+                      {...register("montoVendido")}
+                    />
+                    {errors.montoVendido && (
+                      <p className="text-xs text-red-500">{errors.montoVendido.message}</p>
+                    )}
                   </div>
                   <div className="space-y-1.5">
                     <Label>Moneda</Label>

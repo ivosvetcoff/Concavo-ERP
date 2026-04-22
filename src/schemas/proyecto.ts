@@ -19,12 +19,6 @@ export const crearProyectoSchema = z.object({
     .refine((v) => !isNaN(parseFloat(v)) && parseFloat(v) >= 0, {
       message: "Monto inválido",
     }),
-  anticipo: z
-    .string()
-    .optional()
-    .refine((v) => !v || (!isNaN(parseFloat(v)) && parseFloat(v) >= 0), {
-      message: "Anticipo inválido",
-    }),
   moneda: z.nativeEnum(Moneda).default("MXN"),
   tieneHC: z.boolean().default(false),
   comentarios: z.string().max(500).optional().or(z.literal("")),

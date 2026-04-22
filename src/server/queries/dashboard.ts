@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import Decimal from "decimal.js";
 import { startOfMonth, endOfMonth } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import type { EstadoProyecto, Semaforo, TipoEvento } from "@prisma/client";
@@ -92,7 +93,7 @@ export async function obtenerDashboard(): Promise<{
     }),
     db.compra.aggregate({
       where: { fecha: { gte: inicioMes, lte: finMes } },
-      _sum: { monto: true },
+      _sum: { total: true },
     }),
     db.proyecto.findMany({
       where: { estado: { in: ESTADOS_KANBAN } },
@@ -127,13 +128,13 @@ export async function obtenerDashboard(): Promise<{
     }),
   ]);
 
-  // KPIs — ingresos
+  // KPIs — ingresos (Decimal para evitar pérdida de precisión)
   const ingresosFacturados = proyectosEntregadosMes
     .filter((p) => p.facturado)
-    .reduce((acc, p) => acc + parseFloat(p.montoVendido.toString()), 0);
+    .reduce((acc, p) => acc.plus(new Decimal(p.montoVendido.toString())), new Decimal(0));
   const ingresosEfectivo = proyectosEntregadosMes
     .filter((p) => !p.facturado)
-    .reduce((acc, p) => acc + parseFloat(p.montoVendido.toString()), 0);
+    .reduce((acc, p) => acc.plus(new Decimal(p.montoVendido.toString())), new Decimal(0));
 
   // Kanban — group by estado
   const mapaEstado = new Map<EstadoProyecto, KanbanCard[]>();
@@ -182,10 +183,10 @@ export async function obtenerDashboard(): Promise<{
       proyectosActivos: proyectosActivosCount,
       entregadosMes: proyectosEntregadosMes.length,
       comprasMes: comprasMesCount,
-      totalComprasMes: comprasMesSum._sum.monto?.toString() ?? "0",
+      totalComprasMes: comprasMesSum._sum.total?.toString() ?? "0",
       ingresosFacturadosMes: ingresosFacturados.toFixed(2),
       ingresosEfectivoMes: ingresosEfectivo.toFixed(2),
-      ingresosTotalesMes: (ingresosFacturados + ingresosEfectivo).toFixed(2),
+      ingresosTotalesMes: ingresosFacturados.plus(ingresosEfectivo).toFixed(2),
     },
     kanban,
     heatmap,
