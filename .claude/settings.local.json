@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-git --yes)",
+      "Bash(npm install *)",
+      "Bash(sudo chown *)",
+      "Bash(wait)",
+      "Bash(npm view *)",
+      "Bash(node -e \"const v=require\\('fs'\\).readFileSync\\('/dev/stdin','utf8'\\); const arr=JSON.parse\\(v\\); console.log\\(arr.filter\\(x=>x.startsWith\\('15.'\\)\\).slice\\(-5\\).join\\('\\\\n'\\)\\)\")",
+      "Bash(npm audit *)",
+      "Bash(npx prisma *)",
+      "Bash(DATABASE_URL=\"postgresql://placeholder:placeholder@localhost:5432/concavo\" npx prisma validate)",
+      "Bash(DATABASE_URL=\"postgresql://placeholder:placeholder@localhost:5432/concavo\" npx prisma generate)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000)",
+      "Bash(curl -s -L -o /dev/null -w \"%{http_code} %{url_effective}\" http://localhost:3000)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/sign-in)",
+      "Bash(curl -v http://localhost:3000/)",
+      "Bash(npx tsx *)",
+      "Bash(npx --cache /tmp/npm-cache-concavo shadcn@latest init -d -y)",
+      "Bash(npx --cache /tmp/npm-cache-concavo shadcn@latest add table badge input select dropdown-menu dialog sheet separator -y)",
+      "Bash(npx --cache /tmp/npm-cache-concavo shadcn@latest add label switch -y)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3000/proyectos)",
+      "Bash(npx --cache /tmp/npm-cache-concavo shadcn@latest add tabs tooltip -y)"
+    ]
+  }
+}
