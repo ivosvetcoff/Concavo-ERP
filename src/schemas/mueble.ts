@@ -1,17 +1,18 @@
 import { z } from "zod";
-import { ProcesoTecnico, TipoTercero } from "@prisma/client";
+import { ProcesoTecnico, TipoTercero, EstadoItem, Estructura } from "@prisma/client";
 
 export const crearMuebleSchema = z.object({
   proyectoId: z.string().cuid(),
-  entregaId: z.string().cuid().optional(),
-  modeloId: z.string().cuid().optional(),
   orden: z.string().max(20).optional().or(z.literal("")),
   nombre: z.string().min(1, "El nombre es requerido").max(200),
   cantidad: z.coerce.number().int().min(1).default(1),
   madera: z.string().max(50).optional().or(z.literal("")),
+  estructura: z.nativeEnum(Estructura).nullable().optional(),
+  monto: z.string().optional().or(z.literal("")),
   descripcionLarga: z.string().max(500).optional().or(z.literal("")),
   terceros: z.array(z.nativeEnum(TipoTercero)).default([]),
   notasTerceros: z.string().max(300).optional().or(z.literal("")),
+  estadoItem: z.nativeEnum(EstadoItem).optional(),
   procesoActual: z.nativeEnum(ProcesoTecnico).optional(),
 });
 
@@ -21,9 +22,12 @@ export const actualizarMuebleSchema = z.object({
   nombre: z.string().min(1, "El nombre es requerido").max(200),
   cantidad: z.coerce.number().int().min(1).default(1),
   madera: z.string().max(50).optional().or(z.literal("")),
+  estructura: z.nativeEnum(Estructura).nullable().optional(),
+  monto: z.string().optional().or(z.literal("")),
   descripcionLarga: z.string().max(500).optional().or(z.literal("")),
   terceros: z.array(z.nativeEnum(TipoTercero)).default([]),
   notasTerceros: z.string().max(300).optional().or(z.literal("")),
+  estadoItem: z.nativeEnum(EstadoItem).optional(),
   procesoActual: z.nativeEnum(ProcesoTecnico).nullable().optional(),
 });
 

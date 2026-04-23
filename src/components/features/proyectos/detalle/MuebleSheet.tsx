@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/select";
 import { agregarMueble, actualizarMueble } from "@/server/actions/muebles";
 import type { ProyectoDetalle } from "@/server/queries/proyecto-detalle";
-import type { TipoTercero, ProcesoTecnico } from "@prisma/client";
+import type { TipoTercero, ProcesoTecnico, Estructura, EstadoItem } from "@prisma/client";
 
 type Mueble = ProyectoDetalle["muebles"][0];
 
@@ -35,6 +35,10 @@ const TERCEROS: { value: TipoTercero; label: string }[] = [
   { value: "PIEL", label: "Piel" },
   { value: "ACCESORIOS", label: "Accesorios" },
   { value: "HERRERIA", label: "Herrería" },
+  { value: "MARMOL", label: "Mármol" },
+  { value: "ESPEJO", label: "Espejo" },
+  { value: "TEJIDO", label: "Tejido" },
+  { value: "OTROS", label: "Otros" },
 ];
 
 const PROCESOS: { value: string; label: string }[] = [
@@ -42,9 +46,30 @@ const PROCESOS: { value: string; label: string }[] = [
   { value: "ARMADO", label: "Armado" },
   { value: "PULIDO", label: "Pulido" },
   { value: "LACA", label: "Laca" },
+  { value: "EXTERNO", label: "Externo" },
+  { value: "COMPLEMENTOS", label: "Complementos" },
+  { value: "EMPAQUE", label: "Empaque" },
+  { value: "LISTO_PARA_ENTREGA", label: "Listo p/ entrega" },
+  { value: "ENTREGADO", label: "Entregado" },
+];
+
+const ESTADOS_ITEM: { value: EstadoItem; label: string }[] = [
+  { value: "ESPERA", label: "Espera" },
+  { value: "FABRICACION", label: "Fabricación" },
+  { value: "REPROCESO", label: "Reproceso" },
+  { value: "PAUSA", label: "Pausa" },
+  { value: "CANCELADO", label: "Cancelado" },
+  { value: "ENTREGADO", label: "Entregado" },
+];
+
+const ESTRUCTURAS: { value: Estructura; label: string }[] = [
+  { value: "MDF", label: "MDF" },
+  { value: "PTR", label: "PTR" },
+  { value: "NA", label: "N/A" },
 ];
 
 const PROCESO_NONE = "__none__";
+const ESTRUCTURA_NONE = "__none__";
 
 const formSchema = z.object({
   nombre: z.string().min(1, "El nombre es requerido"),
@@ -67,6 +92,8 @@ export function MuebleSheet({ proyectoId, mueble }: Props) {
   const [loading, setLoading] = useState(false);
   const [terceros, setTerceros] = useState<TipoTercero[]>([]);
   const [proceso, setProceso] = useState<string>(PROCESO_NONE);
+  const [estructura, setEstructura] = useState<string>(ESTRUCTURA_NONE);
+  const [estadoItem, setEstadoItem] = useState<EstadoItem>("ESPERA");
 
   const {
     register,
@@ -87,6 +114,8 @@ export function MuebleSheet({ proyectoId, mueble }: Props) {
       });
       setTerceros((mueble?.terceros as TipoTercero[]) ?? []);
       setProceso(mueble?.procesoActual ?? PROCESO_NONE);
+      setEstructura(mueble?.estructura ?? ESTRUCTURA_NONE);
+      setEstadoItem(mueble?.estadoItem ?? "ESPERA");
     }
   }, [open, mueble, reset]);
 
@@ -100,6 +129,8 @@ export function MuebleSheet({ proyectoId, mueble }: Props) {
     setLoading(true);
     const procesoActual =
       proceso === PROCESO_NONE ? undefined : (proceso as ProcesoTecnico);
+    const estructuraVal =
+      estructura === ESTRUCTURA_NONE ? null : (estructura as Estructura);
     try {
       if (isEdit && mueble) {
         await actualizarMueble({
@@ -110,6 +141,8 @@ export function MuebleSheet({ proyectoId, mueble }: Props) {
           madera: values.madera || undefined,
           notasTerceros: values.notasTerceros || undefined,
           terceros,
+          estructura: estructuraVal,
+          estadoItem,
           procesoActual: procesoActual ?? null,
         });
         toast.success("Mueble actualizado");
@@ -121,6 +154,8 @@ export function MuebleSheet({ proyectoId, mueble }: Props) {
           madera: values.madera || undefined,
           notasTerceros: values.notasTerceros || undefined,
           terceros,
+          estructura: estructuraVal,
+          estadoItem,
           procesoActual,
         });
         toast.success("Mueble agregado");
@@ -197,6 +232,46 @@ export function MuebleSheet({ proyectoId, mueble }: Props) {
                 className="uppercase"
                 {...register("madera")}
               />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label>Estructura</Label>
+              <Select
+                value={estructura}
+                onValueChange={(v) => setEstructura(String(v))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sin definir" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ESTRUCTURA_NONE}>Sin definir</SelectItem>
+                  {ESTRUCTURAS.map((e) => (
+                    <SelectItem key={e.value} value={e.value}>
+                      {e.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Estado ítem</Label>
+              <Select
+                value={estadoItem}
+                onValueChange={(v) => setEstadoItem(v as EstadoItem)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {ESTADOS_ITEM.map((e) => (
+                    <SelectItem key={e.value} value={e.value}>
+                      {e.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

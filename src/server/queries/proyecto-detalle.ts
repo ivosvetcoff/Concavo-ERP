@@ -82,6 +82,7 @@ export type ProyectoDetalle = {
   semaforo: Semaforo;
   semaforoManual: boolean;
   moneda: Moneda;
+  qtyItems: number;
   fechaPO: Date | null;
   fechaCompromiso: Date | null;
   fechaEntrega: Date | null;
@@ -201,6 +202,7 @@ export async function obtenerProyecto(
     semaforo: p.semaforo,
     semaforoManual: p.semaforoManual,
     moneda: p.moneda,
+    qtyItems: p.qtyItems,
     fechaPO: p.fechaPO,
     fechaCompromiso: p.fechaCompromiso,
     fechaEntrega: p.fechaEntrega,

@@ -27,7 +27,7 @@ type Props = {
 export function TabCFDI({ proyecto }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [facturado, setFacturado] = useState(proyecto.facturado);
+  const [facturado, setFacturado] = useState(proyecto.facturado ?? false);
   const [numeroCFDI, setNumeroCFDI] = useState(proyecto.numeroCFDI ?? "");
   const [rfcCliente, setRfcCliente] = useState(proyecto.rfcCliente ?? "");
   const [usoCFDI, setUsoCFDI] = useState(proyecto.usoCFDI ?? "");

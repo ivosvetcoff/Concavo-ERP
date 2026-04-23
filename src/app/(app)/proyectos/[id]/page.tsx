@@ -5,6 +5,7 @@ import { isOwner } from "@/lib/auth";
 import { HeaderProyecto } from "@/components/features/proyectos/detalle/HeaderProyecto";
 import { TabMuebles } from "@/components/features/proyectos/detalle/TabMuebles";
 import { TabCompras } from "@/components/features/proyectos/detalle/TabCompras";
+import { TabAnticipos } from "@/components/features/proyectos/detalle/TabAnticipos";
 import { TabCFDI } from "@/components/features/proyectos/detalle/TabCFDI";
 import { TabHistorial } from "@/components/features/proyectos/detalle/TabHistorial";
 import {
@@ -50,6 +51,11 @@ export default async function ProyectoDetallePage({
             Compras ({proyecto.compras.length})
           </TabsTrigger>
           {owner && (
+            <TabsTrigger value="anticipos">
+              Anticipos ({proyecto.anticipos?.length ?? 0})
+            </TabsTrigger>
+          )}
+          {owner && (
             <TabsTrigger value="cfdi">CFDI</TabsTrigger>
           )}
           <TabsTrigger value="historial">
@@ -64,6 +70,16 @@ export default async function ProyectoDetallePage({
         <TabsContent value="compras" className="mt-4">
           <TabCompras compras={proyecto.compras} isOwner={owner} />
         </TabsContent>
+
+        {owner && proyecto.anticipos && proyecto.montoVendido && (
+          <TabsContent value="anticipos" className="mt-4">
+            <TabAnticipos
+              anticipos={proyecto.anticipos}
+              proyectoId={proyecto.id}
+              montoProyecto={proyecto.montoVendido.toString()}
+            />
+          </TabsContent>
+        )}
 
         {owner && (
           <TabsContent value="cfdi" className="mt-4">

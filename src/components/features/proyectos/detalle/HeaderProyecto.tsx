@@ -149,7 +149,7 @@ export function HeaderProyecto({ proyecto, isOwner }: Props) {
                   <div className="space-y-1.5">
                     <Label>Monto actual</Label>
                     <p className="text-sm font-mono text-gray-600">
-                      {formatMXN(proyecto.montoVendido.toString())}
+                      {formatMXN((proyecto.montoVendido ?? 0).toString())}
                     </p>
                   </div>
                   <div className="space-y-1.5">
@@ -236,7 +236,7 @@ export function HeaderProyecto({ proyecto, isOwner }: Props) {
               <DollarSign className="h-3 w-3" /> Monto vendido
             </p>
             <p className="font-semibold text-base tabular-nums">
-              {formatMXN(proyecto.montoVendido.toString())}
+              {formatMXN((proyecto.montoVendido ?? 0).toString())}
             </p>
           </div>
         )}

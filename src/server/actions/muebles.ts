@@ -25,9 +25,12 @@ export async function agregarMueble(input: CrearMuebleInput) {
         nombre: data.nombre,
         cantidad: data.cantidad,
         madera: data.madera || null,
+        estructura: data.estructura ?? null,
+        monto: data.monto ? data.monto : null,
         descripcionLarga: data.descripcionLarga || null,
         terceros: data.terceros,
         notasTerceros: data.notasTerceros || null,
+        estadoItem: data.estadoItem ?? "ESPERA",
         procesoActual: data.procesoActual ?? null,
         orden: data.orden || null,
       },
@@ -58,7 +61,7 @@ export async function actualizarMueble(input: ActualizarMuebleInput) {
 
   const muebleAnterior = await db.mueble.findUnique({
     where: { id: data.muebleId },
-    select: { procesoActual: true },
+    select: { procesoActual: true, estadoItem: true },
   });
   if (!muebleAnterior) throw new Error("Mueble no encontrado");
 
@@ -72,9 +75,12 @@ export async function actualizarMueble(input: ActualizarMuebleInput) {
         nombre: data.nombre,
         cantidad: data.cantidad,
         madera: data.madera || null,
+        estructura: data.estructura ?? null,
+        monto: data.monto ? data.monto : null,
         descripcionLarga: data.descripcionLarga || null,
         terceros: data.terceros,
         notasTerceros: data.notasTerceros || null,
+        estadoItem: data.estadoItem ?? muebleAnterior.estadoItem,
         procesoActual: data.procesoActual ?? null,
       },
     });
