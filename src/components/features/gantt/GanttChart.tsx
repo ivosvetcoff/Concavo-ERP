@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Gantt from "frappe-gantt";
-import "frappe-gantt/dist/frappe-gantt.css";
+import "@/styles/frappe-gantt.css";
 import { completarTarea, eliminarTarea } from "@/server/actions/nomina-gantt";
 import type { TareaGantt } from "@/server/queries/nomina-gantt";
 import type { EspecialidadEmpleado } from "@prisma/client";
