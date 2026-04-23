@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { crearCompraSchema, type CrearCompraInput } from "@/schemas/compra";
 import { registrarCompra } from "@/server/actions/compras";
+import { uploadComprobanteAction } from "@/server/actions/comprobante";
 
 const CATEGORIAS = [
   { value: "MDF", label: "MDF" },
@@ -93,6 +94,7 @@ export function CompraSheet({ proyectos, proyectoIdDefault, onSuccess }: Props) 
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
 
   const {
     register,
@@ -119,6 +121,7 @@ export function CompraSheet({ proyectos, proyectoIdDefault, onSuccess }: Props) 
 
   useEffect(() => {
     if (open) {
+      setFile(null);
       reset({
         fecha: new Date().toISOString().split("T")[0] as unknown as Date,
         tipo: "INICIAL",
@@ -131,13 +134,22 @@ export function CompraSheet({ proyectos, proyectoIdDefault, onSuccess }: Props) 
   async function onSubmit(values: CrearCompraInput) {
     setLoading(true);
     try {
-      await registrarCompra(values);
+      let comprobanteUrl = "";
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await uploadComprobanteAction(formData, "compras");
+        if (!res.ok) throw new Error(res.error);
+        comprobanteUrl = res.url;
+      }
+
+      await registrarCompra({ ...values, comprobante: comprobanteUrl });
       toast.success("Compra registrada");
       setOpen(false);
       onSuccess?.();
       router.refresh();
-    } catch {
-      toast.error("Error al registrar la compra");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error al registrar la compra");
     } finally {
       setLoading(false);
     }
@@ -389,6 +401,18 @@ export function CompraSheet({ proyectos, proyectoIdDefault, onSuccess }: Props) 
                 <p className="text-xs text-red-500">{errors.rfcProveedor.message}</p>
               )}
             </div>
+          </div>
+
+          {/* Comprobante / Ticket (M16) */}
+          <div className="space-y-1.5 mt-2">
+            <Label htmlFor="comprobanteFile">Comprobante (opcional)</Label>
+            <Input
+              id="comprobanteFile"
+              type="file"
+              accept="image/*,.pdf"
+              onChange={(e) => setFile(e.target.files?.[0] || null)}
+              className="text-xs file:bg-gray-100 file:border-0 file:mr-2 file:px-2 file:py-1 file:rounded"
+            />
           </div>
 
           <Button type="submit" disabled={loading} className="w-full mt-2">

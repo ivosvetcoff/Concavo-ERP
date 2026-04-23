@@ -6,15 +6,16 @@ import { requireAuth } from "@/lib/auth";
 export type ResultadoBusqueda = {
   proyectos: { id: string; codigo: string; nombre: string; cliente: string }[];
   clientes: { id: string; nombre: string; rfc: string | null }[];
+  empleados: { id: string; nombre: string; apellido: string | null; especialidad: string }[];
 };
 
 export async function buscarGlobal(query: string): Promise<ResultadoBusqueda> {
   await requireAuth();
 
   const q = query.trim();
-  if (q.length < 2) return { proyectos: [], clientes: [] };
+  if (q.length < 2) return { proyectos: [], clientes: [], empleados: [] };
 
-  const [proyectos, clientes] = await Promise.all([
+  const [proyectos, clientes, empleados] = await Promise.all([
     db.proyecto.findMany({
       where: {
         OR: [
@@ -46,6 +47,18 @@ export async function buscarGlobal(query: string): Promise<ResultadoBusqueda> {
       orderBy: { nombre: "asc" },
       take: 4,
     }),
+    db.empleado.findMany({
+      where: {
+        activo: true,
+        OR: [
+          { nombre: { contains: q, mode: "insensitive" } },
+          { apellido: { contains: q, mode: "insensitive" } },
+        ],
+      },
+      select: { id: true, nombre: true, apellido: true, especialidad: true },
+      orderBy: { nombre: "asc" },
+      take: 4,
+    }),
   ]);
 
   return {
@@ -56,5 +69,11 @@ export async function buscarGlobal(query: string): Promise<ResultadoBusqueda> {
       cliente: p.cliente.nombre,
     })),
     clientes,
+    empleados: empleados.map((e) => ({
+      id: e.id,
+      nombre: e.nombre,
+      apellido: e.apellido,
+      especialidad: e.especialidad,
+    })),
   };
 }

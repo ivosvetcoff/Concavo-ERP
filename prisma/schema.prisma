@@ -49,6 +49,7 @@ model Empleado {
   registros        RegistroProduccion[]
   pagosNomina      PagoNomina[]
   historialTarifas HistorialTarifa[]
+  ausencias        Ausencia[]
   createdAt        DateTime             @default(now())
   updatedAt        DateTime             @updatedAt
 }
@@ -71,6 +72,35 @@ model HistorialTarifa {
   vigenteHasta DateTime?
 
   @@index([empleadoId, vigenteDesde])
+}
+
+// ===== AUSENCIAS / RRHH =====
+
+model Ausencia {
+  id         String       @id @default(cuid())
+  empleadoId String
+  empleado   Empleado     @relation(fields: [empleadoId], references: [id], onDelete: Cascade)
+  tipo       TipoAusencia
+  fechaInicio DateTime
+  fechaFin   DateTime
+  diasHabiles Int          @default(1)
+  aprobada   Boolean      @default(false)
+  pagada     Boolean      @default(true)
+  notas      String?
+  createdAt  DateTime     @default(now())
+
+  @@index([empleadoId])
+  @@index([fechaInicio])
+  @@index([tipo])
+}
+
+enum TipoAusencia {
+  VACACIONES
+  INCAPACIDAD
+  PERMISO_CON_GOCE
+  PERMISO_SIN_GOCE
+  FALTA
+  DIA_FESTIVO
 }
 
 // ===== CLIENTES =====
@@ -382,7 +412,7 @@ model Compra {
   metodoPago         String
   numeroCFDIRecibido String?
   rfcProveedor       String?
-  comprobante        String?
+  comprobante        String?  // URL en Vercel Blob
   createdAt          DateTime        @default(now())
 
   @@index([proyectoId])
@@ -437,6 +467,7 @@ model Insumo {
   total       Decimal      @db.Decimal(12, 2)
   metodoPago  String
   categoria   String?
+  comprobante String?  // URL en Vercel Blob
   createdAt   DateTime     @default(now())
 
   @@index([fecha])

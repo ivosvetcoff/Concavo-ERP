@@ -31,6 +31,7 @@ export async function registrarCompra(input: CrearCompraInput) {
       metodoPago: data.metodoPago,
       numeroCFDIRecibido: data.numeroCFDIRecibido || null,
       rfcProveedor: data.rfcProveedor || null,
+      comprobante: data.comprobante || null,
     },
   });
 

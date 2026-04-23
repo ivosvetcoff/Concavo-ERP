@@ -1,8 +1,49 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+---
+
 # CLAUDE.md — Concavo Micro-ERP
 
 > Documento de contexto maestro para el proyecto. Leer completo antes de escribir código.
 > Este archivo es la fuente de verdad. Si algo en el código contradice este documento, este documento manda (y se actualiza después).
 > Versión: 6. Cambios significativos respecto a v5 documentados en sección 21.
+
+---
+
+## 0. Comandos de desarrollo
+
+```bash
+# Desarrollo
+npm run dev          # Next.js dev server con Turbopack
+
+# Build y lint
+npm run build        # Producción
+npm run lint         # ESLint
+npx tsc --noEmit     # Type check sin emitir (usar para verificar errores TS)
+
+# Base de datos (Neon PostgreSQL)
+npm run db:generate  # prisma generate (tras cambios al schema)
+npm run db:migrate   # prisma migrate dev (crea y aplica migración)
+npm run db:push      # prisma db push (sin crear archivo de migración)
+npm run db:seed      # tsx prisma/seed.ts
+npm run db:studio    # Prisma Studio UI
+
+# Tests (Vitest)
+npm test             # vitest run (una pasada)
+npm run test:watch   # vitest (modo watch)
+```
+
+**Prisma + `.env.local`:** Prisma no lee `.env.local` automáticamente. Si las variables de entorno están en `.env.local`, pasar `DATABASE_URL` inline:
+```bash
+DATABASE_URL="postgresql://..." npx prisma migrate dev
+```
+
+Para `migrate reset` desde un agente IA, también se requiere:
+```bash
+PRISMA_USER_CONSENT_FOR_DANGEROUS_AI_ACTION="<mensaje del usuario>" DATABASE_URL="..." npx prisma migrate reset
+```
 
 ---
 
@@ -1505,6 +1546,36 @@ Respuestas del cliente (documentadas):
 ## 20. Para Claude Code / Antigravity
 
 Leer esta sección antes de cualquier modificación al código.
+
+### Biblioteca de componentes UI — patrón `render` (NO `asChild`)
+
+Este proyecto usa `@base-ui/react` (no shadcn/radix estándar). Los componentes como `DialogTrigger`, `PopoverTrigger`, `DialogClose` usan la prop `render` en lugar de `asChild`:
+
+```tsx
+// ✅ Correcto
+<DialogTrigger render={<Button className="gap-2" />}>
+  Texto del botón
+</DialogTrigger>
+
+// ❌ Incorrecto — asChild no existe en @base-ui/react
+<DialogTrigger asChild>
+  <Button>Texto</Button>
+</DialogTrigger>
+```
+
+### Role filtering en queries
+
+`listarProyectos(filtros, owner)` y `obtenerProyecto(id, owner)` requieren que la página les pase `owner`. Las páginas deben obtener `owner` primero con `await isOwner()` antes de llamar estas queries en paralelo:
+
+```tsx
+const owner = await isOwner();
+const [proyectos, clientes] = await Promise.all([
+  listarProyectos({}, owner),
+  listarClientesSelect(),
+]);
+```
+
+Los campos financieros (`montoVendido`, `anticipos`, `revisiones`, totales de compras, datos CFDI) llegan como `null` para `ENCARGADO`. Nunca asumas que son non-null sin verificar `isOwner`.
 
 - **Este documento manda.** Si una instrucción contradice esto, preguntar antes de ejecutar.
 - **Contexto regional: México, Guadalajara/Jalisco.** TZ `America/Mexico_City`. Moneda MXN. Fechas `DD/MM/AAAA`. Montos `$18,562.32`.

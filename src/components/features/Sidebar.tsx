@@ -9,24 +9,39 @@ import {
   FolderOpen,
   Users,
   ShoppingCart,
-  BookOpen,
+  Package,
+  Receipt,
   BarChart3,
   CalendarDays,
   UserCheck,
   FileText,
+  ClipboardList,
+  Activity,
+  HeartPulse,
+  DollarSign,
 } from "lucide-react";
 
+
 const navItems = [
+  // Operación
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/proyectos", label: "Proyectos", icon: FolderOpen },
   { href: "/clientes", label: "Clientes", icon: Users },
+  { href: "/produccion", label: "Producción", icon: ClipboardList },
+  { href: "/gantt", label: "Gantt", icon: CalendarDays },
+  { href: "/ocupacion", label: "Ocupación", icon: Activity },
+  // Compras y egresos
   { href: "/compras", label: "Compras", icon: ShoppingCart },
-  { href: "/catalogo", label: "Catálogo", icon: BookOpen },
+  { href: "/insumos", label: "Insumos", icon: Package },
+  { href: "/gastos", label: "Gastos fijos", icon: Receipt },
+  // Financiero
   { href: "/cierre", label: "Cierre mensual", icon: BarChart3 },
-  // Fase 2
-  { href: "/gantt", label: "Gantt", icon: CalendarDays, fase2: true },
+  // Personas
   { href: "/empleados", label: "Empleados", icon: UserCheck },
-  { href: "/nomina", label: "Nómina", icon: FileText, fase2: true },
+  { href: "/nomina", label: "Nómina", icon: FileText },
+  { href: "/rrhh", label: "Recursos Humanos", icon: HeartPulse },
+  // Financiero & Config
+  { href: "/tipocambio", label: "Tipos de Cambio", icon: DollarSign },
 ];
 
 export function Sidebar() {
@@ -40,7 +55,7 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 px-2 py-4 space-y-0.5 overflow-y-auto">
-        {navItems.map(({ href, label, icon: Icon, fase2 }) => {
+        {navItems.map(({ href, label, icon: Icon }) => {
           const isActive = pathname === href || pathname.startsWith(href + "/");
           return (
             <Link
@@ -50,15 +65,11 @@ export function Sidebar() {
                 "flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-colors",
                 isActive
                   ? "bg-gray-100 text-gray-900 font-medium"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
-                fase2 && "opacity-50"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
               )}
             >
               <Icon className="h-4 w-4 flex-shrink-0" />
               <span>{label}</span>
-              {fase2 && (
-                <span className="ml-auto text-[10px] text-gray-400">F2</span>
-              )}
             </Link>
           );
         })}

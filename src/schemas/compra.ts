@@ -36,6 +36,8 @@ export const crearCompraSchema = z.object({
     .regex(/^[A-Z&Ñ]{3,4}[0-9]{6}[A-Z0-9]{3}$/, "RFC inválido")
     .optional()
     .or(z.literal("")),
+  comprobante: z.string().optional().or(z.literal("")),
 });
 
 export type CrearCompraInput = z.infer<typeof crearCompraSchema>;
+

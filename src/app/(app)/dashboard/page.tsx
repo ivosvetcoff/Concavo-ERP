@@ -5,6 +5,7 @@ import { KanbanProyectos } from "@/components/features/dashboard/KanbanProyectos
 import { GraficoEstados } from "@/components/features/dashboard/GraficoEstados";
 import { GraficoProcesos } from "@/components/features/dashboard/GraficoProcesos";
 import { FeedActividad } from "@/components/features/dashboard/FeedActividad";
+import { AlertasDashboard } from "@/components/features/dashboard/AlertasDashboard";
 import { formatMonthYear } from "@/lib/format";
 
 export default async function DashboardPage() {
@@ -24,6 +25,9 @@ export default async function DashboardPage() {
           <p className="text-sm text-gray-400 mt-0.5">{mesActual}</p>
         </div>
       </div>
+
+      {/* Alertas */}
+      <AlertasDashboard alertas={dashboard.alertas} />
 
       {/* KPIs */}
       <KPICards kpis={dashboard.kpis} isOwner={owner} />

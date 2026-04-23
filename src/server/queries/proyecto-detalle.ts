@@ -13,6 +13,7 @@ import type {
   CategoriaCompra,
   TipoCompra,
   TipoEvento,
+  EstatusPago,
 } from "@prisma/client";
 import type { Decimal } from "@prisma/client/runtime/library";
 
@@ -54,6 +55,17 @@ export type AnticipoDetalle = {
   metodoPago: string;
   cfdiEmitido: boolean;
   numeroCFDI: string | null;
+};
+
+export type PagoDetalle = {
+  id: string;
+  monto: Decimal;
+  fecha: Date;
+  metodoPago: string;
+  estatus: EstatusPago;
+  cfdiEmitido: boolean;
+  numeroCFDI: string | null;
+  notas: string | null;
 };
 
 export type RevisionDetalle = {
@@ -105,6 +117,7 @@ export type ProyectoDetalle = {
   formaPago: string | null;
   fechaFacturacion: Date | null;
   anticipos: AnticipoDetalle[] | null;
+  pagos: PagoDetalle[] | null;
   revisiones: RevisionDetalle[] | null;
 };
 
@@ -164,6 +177,19 @@ export async function obtenerProyecto(
           metodoPago: true,
           cfdiEmitido: true,
           numeroCFDI: true,
+        },
+      },
+      pagos: {
+        orderBy: { fecha: "desc" },
+        select: {
+          id: true,
+          monto: true,
+          fecha: true,
+          metodoPago: true,
+          estatus: true,
+          cfdiEmitido: true,
+          numeroCFDI: true,
+          notas: true,
         },
       },
       eventos: {
@@ -236,6 +262,7 @@ export async function obtenerProyecto(
     formaPago: owner ? p.formaPago : null,
     fechaFacturacion: owner ? p.fechaFacturacion : null,
     anticipos: owner ? p.anticipos : null,
+    pagos: owner ? p.pagos : null,
     revisiones: owner ? p.revisiones : null,
   };
 }

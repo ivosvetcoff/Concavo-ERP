@@ -59,11 +59,27 @@ export type DashboardKPIs = {
   ingresosTotalesMes: string;
 };
 
+export type AlertaItem = {
+  id: string;
+  codigo: string;
+  nombre: string;
+  clienteNombre: string;
+  semaforo: Semaforo;
+  fechaCompromiso: Date | null;
+};
+
+export type DashboardAlertas = {
+  criticos: AlertaItem[];
+  atrasados: AlertaItem[];
+  comprasSinAsignar: number;
+};
+
 export async function obtenerDashboard(): Promise<{
   kpis: DashboardKPIs;
   kanban: KanbanColumna[];
   heatmap: HeatmapBucket[];
   actividad: ActividadItem[];
+  alertas: DashboardAlertas;
 }> {
   const ahora = toZonedTime(new Date(), TIMEZONE);
   const inicioMes = startOfMonth(ahora);
@@ -77,6 +93,8 @@ export async function obtenerDashboard(): Promise<{
     kanbanProyectos,
     mueblesPorProceso,
     actividadReciente,
+    proyectosAlerta,
+    comprasSinAsignarCount,
   ] = await Promise.all([
     db.proyecto.count({
       where: { estado: { in: ESTADOS_KANBAN } },
@@ -126,6 +144,22 @@ export async function obtenerDashboard(): Promise<{
         usuario: { select: { name: true } },
       },
     }),
+    db.proyecto.findMany({
+      where: {
+        semaforo: { in: ["CRITICO", "ATRASADO"] },
+        estado: { notIn: ["ENTREGADO", "CANCELADO", "PAUSA"] },
+      },
+      orderBy: [{ semaforo: "asc" }, { fechaCompromiso: "asc" }],
+      select: {
+        id: true,
+        codigo: true,
+        nombre: true,
+        semaforo: true,
+        fechaCompromiso: true,
+        cliente: { select: { nombre: true } },
+      },
+    }),
+    db.compra.count({ where: { proyectoId: null } }),
   ]);
 
   // KPIs — ingresos (Decimal para evitar pérdida de precisión)
@@ -166,6 +200,21 @@ export async function obtenerDashboard(): Promise<{
     count: g._count._all,
   }));
 
+  // Alertas
+  const alertaItems = (p: typeof proyectosAlerta[0]): AlertaItem => ({
+    id: p.id,
+    codigo: p.codigo,
+    nombre: p.nombre,
+    clienteNombre: p.cliente.nombre,
+    semaforo: p.semaforo,
+    fechaCompromiso: p.fechaCompromiso,
+  });
+  const alertas: DashboardAlertas = {
+    criticos: proyectosAlerta.filter((p) => p.semaforo === "CRITICO").map(alertaItems),
+    atrasados: proyectosAlerta.filter((p) => p.semaforo === "ATRASADO").map(alertaItems),
+    comprasSinAsignar: comprasSinAsignarCount,
+  };
+
   // Actividad
   const actividad: ActividadItem[] = actividadReciente.map((e) => ({
     id: e.id,
@@ -191,5 +240,6 @@ export async function obtenerDashboard(): Promise<{
     kanban,
     heatmap,
     actividad,
+    alertas,
   };
 }

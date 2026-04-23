@@ -14,6 +14,8 @@ import {
 } from "@/schemas/proyecto";
 import { generarCodigoProyecto } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
+import { emailProyectoEntregado } from "@/lib/email";
+import { formatMXN } from "@/lib/format";
 
 export async function crearProyecto(input: CrearProyectoInput) {
   const user = await requireAuth();
@@ -61,7 +63,7 @@ export async function cambiarEstadoProyecto(input: CambiarEstadoInput) {
     select: { estado: true },
   });
 
-  await db.proyecto.update({
+  const proyecto = await db.proyecto.update({
     where: { id: proyectoId },
     data: {
       estado,
@@ -74,7 +76,21 @@ export async function cambiarEstadoProyecto(input: CambiarEstadoInput) {
         },
       },
     },
+    include: {
+      cliente: { select: { nombre: true } },
+    },
   });
+
+  // M15: fire alert emails (non-blocking)
+  if (estado === "ENTREGADO") {
+    emailProyectoEntregado({
+      codigo: proyecto.codigo,
+      nombre: proyecto.nombre,
+      cliente: proyecto.cliente.nombre,
+      monto: formatMXN(proyecto.montoVendido.toString()),
+      proyectoId,
+    }).catch(console.error);
+  }
 
   revalidatePath(`/proyectos/${proyectoId}`);
   revalidatePath("/proyectos");
