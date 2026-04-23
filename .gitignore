@@ -37,3 +37,6 @@ next-env.d.ts
 # prisma
 prisma/*.db
 prisma/*.db-journal
+
+# datos reales del cliente (no subir al repo)
+/Cliente/
