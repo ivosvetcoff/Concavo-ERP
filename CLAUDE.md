@@ -1577,6 +1577,55 @@ const [proyectos, clientes] = await Promise.all([
 
 Los campos financieros (`montoVendido`, `anticipos`, `revisiones`, totales de compras, datos CFDI) llegan como `null` para `ENCARGADO`. Nunca asumas que son non-null sin verificar `isOwner`.
 
+### Auth — Clerk + User.clerkId
+
+Clerk maneja la sesión. El `userId` de Clerk se guarda en `User.clerkId` (campo único en la DB). El **rol** (`OWNER` / `ENCARGADO`) vive en `User.role` en Postgres, no en Clerk metadata.
+
+- `requireAuth()` → devuelve User de DB; lanza si no autenticado.
+- `requireOwner()` → lanza si `user.role !== "OWNER"`. Usar en actions de empleados, tarifas, montos.
+- `isOwner()` → boolean; usar en Server Components para condicionar UI y queries.
+- `syncUser()` → upsert al hacer login; llamado desde webhook Clerk en `src/app/api/webhooks/clerk/route.ts`.
+
+### Estado de módulos implementados
+
+| Módulo | Ruta | Estado |
+|---|---|---|
+| M1 Proyectos | `/proyectos` | ✅ Completo |
+| M2 Muebles / WIP | tabs de `/proyectos/[id]` | ✅ Completo |
+| M3 Compras | `/compras` | ✅ Completo |
+| M6 Anticipos | tab en `/proyectos/[id]` | ✅ Completo |
+| M7 Empleados | `/empleados` | ✅ Completo |
+| M10 Command Palette | global (Cmd+K) | ✅ Completo |
+| Cálculos utilidad | `src/server/calculations/` | ✅ Con 25 tests |
+| M4 Insumos | `/insumos` | 🔲 Stub — próximo |
+| M5 Gastos fijos | `/gastos` | 🔲 Stub — próximo |
+| M8 Producción semanal | `/produccion` | 🔲 Stub |
+| M9 Cierre mensual | `/cierre` | 🔲 Stub |
+| M11 Dashboard | `/dashboard` | 🔲 Stub |
+
+Los stubs son páginas vacías. El orden recomendado para implementar: M4+M5 → M8 → M9 → M11.
+
+### Patrón de server action
+
+```ts
+"use server";
+export async function miAction(input: MiInput) {
+  await requireOwner();          // o requireAuth()
+  const data = miSchema.parse(input);
+  await db.miModelo.create({ data: ... });
+  revalidatePath("/mi-ruta");
+  return { ok: true };
+}
+```
+
+### Decimal en frontend
+
+`Prisma.Decimal` no es serializable directamente a Client Components. Hacer `.toString()` en queries antes de devolver:
+```ts
+// En la query:
+tarifaHoraTO: isOwner ? e.tarifaHoraTO.toString() : null,
+```
+
 - **Este documento manda.** Si una instrucción contradice esto, preguntar antes de ejecutar.
 - **Contexto regional: México, Guadalajara/Jalisco.** TZ `America/Mexico_City`. Moneda MXN. Fechas `DD/MM/AAAA`. Montos `$18,562.32`.
 - **Los 9 procesos técnicos (HABILITADO → ARMADO → PULIDO → LACA → EXTERNO → COMPLEMENTOS → EMPAQUE → LISTO_PARA_ENTREGA → ENTREGADO) son canónicos.** Confirmados contra hoja DATOS del Excel.
