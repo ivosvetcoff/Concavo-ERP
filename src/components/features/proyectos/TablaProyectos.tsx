@@ -54,21 +54,22 @@ export function TablaProyectos({ data, isOwner }: Props) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [ocultarEntregados, setOcultarEntregados] = useState(false);
 
   const columns = getColumnasProyectos(isOwner);
 
   const filteredData = useMemo(() => {
-    if (!dateRange?.from) return data;
-    return data.filter((d) => {
+    let result = data;
+    if (ocultarEntregados) result = result.filter((d) => d.estado !== "ENTREGADO");
+    if (!dateRange?.from) return result;
+    return result.filter((d) => {
       if (!d.fechaCompromiso) return false;
       const dDate = new Date(d.fechaCompromiso);
-      
       const isAfterStart = dDate >= startOfDay(dateRange.from!);
       const isBeforeEnd = dateRange.to ? dDate <= endOfDay(dateRange.to) : true;
-      
       return isAfterStart && isBeforeEnd;
     });
-  }, [data, dateRange]);
+  }, [data, dateRange, ocultarEntregados]);
 
   const table = useReactTable({
     data: filteredData,
@@ -185,6 +186,14 @@ export function TablaProyectos({ data, isOwner }: Props) {
             ))}
           </SelectContent>
         </Select>
+        <Button
+          variant="outline"
+          size="sm"
+          className={`h-9 gap-1.5 text-xs ${ocultarEntregados ? "border-green-400 text-green-700 bg-green-50 hover:bg-green-100" : "text-gray-500"}`}
+          onClick={() => setOcultarEntregados((v) => !v)}
+        >
+          {ocultarEntregados ? "Mostrar entregados" : "Ocultar entregados"}
+        </Button>
         <span className="ml-auto text-sm text-gray-500">
           {table.getFilteredRowModel().rows.length} proyecto
           {table.getFilteredRowModel().rows.length !== 1 ? "s" : ""}
@@ -216,16 +225,19 @@ export function TablaProyectos({ data, isOwner }: Props) {
           <TableBody>
             {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => {
+                const estado = row.original.estado;
                 const sem = row.original.semaforo;
                 const rowBg =
-                  sem === "CRITICO"
-                    ? "bg-red-50 hover:bg-red-100"
+                  estado === "ENTREGADO"
+                    ? "bg-green-50 hover:bg-green-100"
+                    : sem === "CRITICO"
+                    ? "bg-red-100 hover:bg-red-200"
                     : sem === "ATRASADO"
-                    ? "bg-orange-50 hover:bg-orange-100"
+                    ? "bg-orange-100 hover:bg-orange-200"
                     : sem === "PRECAUCION"
-                    ? "bg-amber-50 hover:bg-amber-100"
+                    ? "bg-amber-100 hover:bg-amber-150"
                     : sem === "PAUSA"
-                    ? "bg-gray-50 hover:bg-gray-100"
+                    ? "bg-gray-100 hover:bg-gray-200"
                     : "hover:bg-gray-50";
                 return (
                 <TableRow
