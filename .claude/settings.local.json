@@ -33,7 +33,8 @@
       "Bash(sed -i '' '1{/^\"use server\";$/d;}' /Users/ivosvetcoff/Desktop/Proyectos/Concavo-ERP/src/server/queries/proyecto-detalle.ts)",
       "Bash(sed -i '' '1{/^\"use server\";$/d;}' /Users/ivosvetcoff/Desktop/Proyectos/Concavo-ERP/src/server/queries/proyectos.ts)",
       "Bash(git commit -m 'fix: dashboard rediseñado, Decimal serializable, auth optimizada *)",
-      "Bash(git commit -m 'chore: actualizar configuración local Claude *)"
+      "Bash(git commit -m 'chore: actualizar configuración local Claude *)",
+      "Bash(node -e ' *)"
     ]
   }
 }
