@@ -35,14 +35,22 @@ export function getColumnasProyectos(isOwner: boolean): ColumnDef<ProyectoRow>[]
     },
     {
       accessorKey: "cliente",
-      header: "CLIENTE",
+      header: ({ column }) => (
+        <Button variant="ghost" size="sm" className="-ml-3 h-8" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          CLIENTE <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
+        </Button>
+      ),
       cell: ({ row }) => (
         <span className="font-medium">{row.original.cliente}</span>
       ),
     },
     {
       accessorKey: "nombre",
-      header: "NOMBRE",
+      header: ({ column }) => (
+        <Button variant="ghost" size="sm" className="-ml-3 h-8" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          NOMBRE <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
+        </Button>
+      ),
       cell: ({ row }) => (
         <span className="text-gray-700 max-w-[200px] truncate block" title={row.original.nombre}>
           {row.original.nombre}
@@ -68,14 +76,22 @@ export function getColumnasProyectos(isOwner: boolean): ColumnDef<ProyectoRow>[]
     },
     {
       accessorKey: "po",
-      header: "P.O.",
+      header: ({ column }) => (
+        <Button variant="ghost" size="sm" className="-ml-3 h-8" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          P.O. <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
+        </Button>
+      ),
       cell: ({ row }) => (
         <span className="text-gray-500 text-sm">{row.original.po ?? "—"}</span>
       ),
     },
     {
       accessorKey: "fechaPO",
-      header: "FECHA P.O.",
+      header: ({ column }) => (
+        <Button variant="ghost" size="sm" className="-ml-3 h-8" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          FECHA P.O. <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
+        </Button>
+      ),
       cell: ({ row }) => (
         <span className="text-sm tabular-nums">
           {formatDate(row.original.fechaPO)}
@@ -103,7 +119,11 @@ export function getColumnasProyectos(isOwner: boolean): ColumnDef<ProyectoRow>[]
     },
     {
       accessorKey: "fechaEntrega",
-      header: "ENTREGA",
+      header: ({ column }) => (
+        <Button variant="ghost" size="sm" className="-ml-3 h-8" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          ENTREGA <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
+        </Button>
+      ),
       cell: ({ row }) => (
         <span className="text-sm tabular-nums">
           {formatDate(row.original.fechaEntrega)}
@@ -112,7 +132,11 @@ export function getColumnasProyectos(isOwner: boolean): ColumnDef<ProyectoRow>[]
     },
     {
       accessorKey: "estado",
-      header: "ESTATUS",
+      header: ({ column }) => (
+        <Button variant="ghost" size="sm" className="-ml-3 h-8" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          ESTATUS <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
+        </Button>
+      ),
       cell: ({ row }) => {
         const cfg = estadoProyectoConfig[row.original.estado];
         return (
@@ -124,7 +148,11 @@ export function getColumnasProyectos(isOwner: boolean): ColumnDef<ProyectoRow>[]
     },
     {
       accessorKey: "semaforo",
-      header: "EN TIEMPO",
+      header: ({ column }) => (
+        <Button variant="ghost" size="sm" className="-ml-3 h-8" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          EN TIEMPO <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
+        </Button>
+      ),
       cell: ({ row }) => {
         const cfg = semaforoConfig[row.original.semaforo];
         return (
@@ -136,7 +164,11 @@ export function getColumnasProyectos(isOwner: boolean): ColumnDef<ProyectoRow>[]
     },
     {
       accessorKey: "tieneHC",
-      header: "HC",
+      header: ({ column }) => (
+        <Button variant="ghost" size="sm" className="-ml-3 h-8" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          HC <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
+        </Button>
+      ),
       cell: ({ row }) =>
         row.original.tieneHC ? (
           <CheckCircle2 className="h-4 w-4 text-green-600 mx-auto" />
@@ -148,7 +180,11 @@ export function getColumnasProyectos(isOwner: boolean): ColumnDef<ProyectoRow>[]
       ? [
           {
             accessorKey: "montoVendido" as keyof ProyectoRow,
-            header: "MONTO",
+            header: ({ column }: { column: import("@tanstack/react-table").Column<ProyectoRow> }) => (
+              <Button variant="ghost" size="sm" className="-ml-3 h-8" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+                MONTO <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
+              </Button>
+            ),
             cell: ({ row }: { row: { original: ProyectoRow } }) => (
               <span className="tabular-nums font-medium">
                 {formatMXN(row.original.montoVendido)}
@@ -173,7 +209,11 @@ export function getColumnasProyectos(isOwner: boolean): ColumnDef<ProyectoRow>[]
       : []),
     {
       accessorKey: "comentarios",
-      header: "COMENTARIOS",
+      header: ({ column }) => (
+        <Button variant="ghost" size="sm" className="-ml-3 h-8" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          COMENTARIOS <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
+        </Button>
+      ),
       cell: ({ row }) => (
         <span
           className="text-gray-500 text-sm max-w-[200px] truncate block"
