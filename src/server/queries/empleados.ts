@@ -5,6 +5,7 @@ export type EmpleadoRow = {
   id: string;
   nombre: string;
   apellido: string | null;
+  iniciales: string | null;
   especialidad: EspecialidadEmpleado;
   activo: boolean;
   color: string | null;
@@ -26,6 +27,7 @@ export async function listarEmpleados(isOwner: boolean): Promise<EmpleadoRow[]> 
       id: true,
       nombre: true,
       apellido: true,
+      iniciales: true,
       especialidad: true,
       activo: true,
       color: true,

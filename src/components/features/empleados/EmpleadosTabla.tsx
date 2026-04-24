@@ -143,12 +143,19 @@ export function EmpleadosTabla({ empleados, isOwner }: Props) {
                 >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
-                      {e.color && (
+                      {e.color ? (
                         <span
-                          className="h-3 w-3 rounded-full flex-shrink-0"
+                          className="h-6 w-6 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-bold text-white"
                           style={{ backgroundColor: e.color }}
-                        />
-                      )}
+                          title={e.iniciales ?? ""}
+                        >
+                          {e.iniciales ?? ""}
+                        </span>
+                      ) : e.iniciales ? (
+                        <span className="h-6 w-6 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-bold bg-gray-200 text-gray-600">
+                          {e.iniciales}
+                        </span>
+                      ) : null}
                       <span className="font-medium text-gray-900">
                         {e.nombre}
                         {e.apellido ? ` ${e.apellido}` : ""}

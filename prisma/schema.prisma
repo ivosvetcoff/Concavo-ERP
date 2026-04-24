@@ -36,6 +36,7 @@ model Empleado {
   id               String               @id @default(cuid())
   nombre           String
   apellido         String?
+  iniciales        String?
   especialidad     EspecialidadEmpleado
   tarifaHoraTO     Decimal              @db.Decimal(10, 2)
   tarifaHoraTE     Decimal              @db.Decimal(10, 2)

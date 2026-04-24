@@ -57,6 +57,8 @@ export function EmpleadoSheet(props: Props) {
   });
 
   const tarifaTO = useWatch({ control, name: "tarifaHoraTO" });
+  const nombreVal = useWatch({ control, name: "nombre" });
+  const apellidoVal = useWatch({ control, name: "apellido" });
 
   useEffect(() => {
     if (open) {
@@ -64,6 +66,7 @@ export function EmpleadoSheet(props: Props) {
         reset({
           nombre: empleado.nombre,
           apellido: empleado.apellido ?? "",
+          iniciales: empleado.iniciales ?? "",
           especialidad: empleado.especialidad,
           tarifaHoraTO: empleado.tarifaHoraTO ? Number(empleado.tarifaHoraTO) : undefined,
           tarifaHoraTE: empleado.tarifaHoraTE ? Number(empleado.tarifaHoraTE) : undefined,
@@ -159,6 +162,40 @@ export function EmpleadoSheet(props: Props) {
                 {...register("apellido")}
               />
             </div>
+          </div>
+
+          {/* Iniciales */}
+          <div className="space-y-1.5">
+            <Label htmlFor="iniciales">
+              Perfil / Iniciales
+              <span className="ml-1 text-xs text-gray-400 font-normal">(máx 5 caracteres)</span>
+            </Label>
+            <div className="flex items-center gap-2">
+              <Input
+                id="iniciales"
+                className="uppercase w-28 font-mono tracking-wider"
+                placeholder="PG"
+                maxLength={5}
+                {...register("iniciales")}
+                onChange={(e) => setValue("iniciales", e.target.value.toUpperCase())}
+              />
+              {(nombreVal || apellidoVal) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const n = (nombreVal ?? "").charAt(0);
+                    const a = (apellidoVal ?? "").charAt(0);
+                    setValue("iniciales", (n + a).toUpperCase());
+                  }}
+                  className="text-xs text-indigo-600 hover:text-indigo-800 px-2 py-1 rounded border border-indigo-200 hover:bg-indigo-50 transition-colors"
+                >
+                  Auto-sugerir
+                </button>
+              )}
+            </div>
+            {errors.iniciales && (
+              <p className="text-xs text-red-500">{errors.iniciales.message}</p>
+            )}
           </div>
 
           {/* Especialidad */}

@@ -69,7 +69,7 @@ export default async function DashboardPage({
       {/* Métricas del mes: KPIs + gráficos */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <KPICards kpis={dashboard.kpis} isOwner={owner} mesLabel={mesLabelCap} />
-        <GraficoEstados kanban={dashboard.kanban} entregadosMes={dashboard.kpis.entregadosMes} />
+        <GraficoEstados kanban={dashboard.kanban} entregadosMes={dashboard.kpis.entregadosMes} entregadosCards={dashboard.entregadosCards} />
         <GraficoProcesos heatmap={dashboard.heatmap} />
       </div>
 

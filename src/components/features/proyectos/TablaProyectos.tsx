@@ -215,10 +215,22 @@ export function TablaProyectos({ data, isOwner }: Props) {
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows.length ? (
-              table.getRowModel().rows.map((row) => (
+              table.getRowModel().rows.map((row) => {
+                const sem = row.original.semaforo;
+                const rowBg =
+                  sem === "CRITICO"
+                    ? "bg-red-50 hover:bg-red-100"
+                    : sem === "ATRASADO"
+                    ? "bg-orange-50 hover:bg-orange-100"
+                    : sem === "PRECAUCION"
+                    ? "bg-amber-50 hover:bg-amber-100"
+                    : sem === "PAUSA"
+                    ? "bg-gray-50 hover:bg-gray-100"
+                    : "hover:bg-gray-50";
+                return (
                 <TableRow
                   key={row.id}
-                  className="hover:bg-gray-50 transition-colors"
+                  className={`transition-colors ${rowBg}`}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="py-2.5">
@@ -229,7 +241,8 @@ export function TablaProyectos({ data, isOwner }: Props) {
                     </TableCell>
                   ))}
                 </TableRow>
-              ))
+              );
+              })
             ) : (
               <TableRow>
                 <TableCell

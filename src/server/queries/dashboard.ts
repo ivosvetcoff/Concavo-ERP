@@ -77,6 +77,7 @@ export type DashboardAlertas = {
 export async function obtenerDashboard(mes?: number, anio?: number): Promise<{
   kpis: DashboardKPIs;
   kanban: KanbanColumna[];
+  entregadosCards: KanbanCard[];
   heatmap: HeatmapBucket[];
   actividad: ActividadItem[];
   alertas: DashboardAlertas;
@@ -107,7 +108,17 @@ export async function obtenerDashboard(mes?: number, anio?: number): Promise<{
         estado: "ENTREGADO",
         fechaEntrega: { gte: inicioMes, lte: finMes },
       },
-      select: { montoVendido: true, facturado: true },
+      select: {
+        id: true,
+        codigo: true,
+        nombre: true,
+        semaforo: true,
+        fechaCompromiso: true,
+        qtyItems: true,
+        montoVendido: true,
+        facturado: true,
+        cliente: { select: { nombre: true } },
+      },
     }),
     db.compra.count({
       where: { fecha: { gte: inicioMes, lte: finMes } },
@@ -230,6 +241,16 @@ export async function obtenerDashboard(mes?: number, anio?: number): Promise<{
     usuarioNombre: e.usuario?.name ?? null,
   }));
 
+  const entregadosCards: KanbanCard[] = proyectosEntregadosMes.map((p) => ({
+    id: p.id,
+    codigo: p.codigo,
+    nombre: p.nombre,
+    cliente: p.cliente.nombre,
+    semaforo: p.semaforo,
+    fechaCompromiso: p.fechaCompromiso,
+    qtyItems: p.qtyItems,
+  }));
+
   return {
     kpis: {
       proyectosActivos: proyectosActivosCount,
@@ -241,6 +262,7 @@ export async function obtenerDashboard(mes?: number, anio?: number): Promise<{
       ingresosTotalesMes: ingresosFacturados.plus(ingresosEfectivo).toFixed(2),
     },
     kanban,
+    entregadosCards,
     heatmap,
     actividad,
     alertas,

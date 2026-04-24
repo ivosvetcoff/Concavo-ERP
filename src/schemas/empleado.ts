@@ -3,6 +3,7 @@ import { z } from "zod";
 export const empleadoSchema = z.object({
   nombre: z.string().min(1, "El nombre es requerido").max(100),
   apellido: z.string().max(100).optional().or(z.literal("")),
+  iniciales: z.string().max(5).optional().or(z.literal("")),
   especialidad: z.enum([
     "HABILITADOR",
     "ARMADOR",

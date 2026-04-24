@@ -13,6 +13,7 @@ export async function crearEmpleado(input: EmpleadoInput) {
     data: {
       nombre: data.nombre,
       apellido: data.apellido || null,
+      iniciales: data.iniciales || null,
       especialidad: data.especialidad,
       tarifaHoraTO: data.tarifaHoraTO,
       tarifaHoraTE: data.tarifaHoraTE,
@@ -40,6 +41,7 @@ export async function actualizarEmpleado(id: string, input: EmpleadoInput) {
     data: {
       nombre: data.nombre,
       apellido: data.apellido || null,
+      iniciales: data.iniciales || null,
       especialidad: data.especialidad,
       tarifaHoraTO: data.tarifaHoraTO,
       tarifaHoraTE: data.tarifaHoraTE,
