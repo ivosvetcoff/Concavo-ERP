@@ -51,7 +51,17 @@ export function getColumnasProyectos(isOwner: boolean): ColumnDef<ProyectoRow>[]
     },
     {
       accessorKey: "qtyItems",
-      header: "QTY",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          size="sm"
+          className="-ml-3 h-8"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          QTY
+          <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
+        </Button>
+      ),
       cell: ({ row }) => (
         <span className="text-center block">{row.original.qtyItems}</span>
       ),
