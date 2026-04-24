@@ -22,15 +22,30 @@ type Props = { kanban: KanbanColumna[] };
 
 export function KanbanProyectos({ kanban }: Props) {
   const conProyectos = kanban.filter((c) => c.cards.length > 0);
-  const sinProyectos = kanban.filter((c) => c.cards.length === 0);
-  const ordenado = [...conProyectos, ...sinProyectos];
+
+  if (conProyectos.length === 0) {
+    return (
+      <div>
+        <h2 className="text-sm font-semibold text-gray-700 mb-3">Estado de proyectos</h2>
+        <div className="h-24 flex items-center justify-center border-2 border-dashed border-gray-100 rounded-xl">
+          <p className="text-sm text-gray-400">Sin proyectos activos</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
-      <h2 className="text-sm font-semibold text-gray-700 mb-3">Estado de proyectos</h2>
+      <div className="flex items-center justify-between mb-3">
+        <h2 className="text-sm font-semibold text-gray-700">Estado de proyectos</h2>
+        <span className="text-xs text-gray-400 tabular-nums">
+          {conProyectos.reduce((acc, c) => acc + c.cards.length, 0)} proyectos ·{" "}
+          {conProyectos.length} estado{conProyectos.length !== 1 ? "s" : ""}
+        </span>
+      </div>
       <div className="overflow-x-auto pb-2 -mx-1 px-1">
         <div className="flex gap-3 min-w-max">
-          {ordenado.map((columna) => (
+          {conProyectos.map((columna) => (
             <Columna key={columna.estado} columna={columna} />
           ))}
         </div>
@@ -41,23 +56,19 @@ export function KanbanProyectos({ kanban }: Props) {
 
 function Columna({ columna }: { columna: KanbanColumna }) {
   const config = estadoProyectoConfig[columna.estado as EstadoProyecto];
-  const isEmpty = columna.cards.length === 0;
 
   return (
-    <div className={`w-52 flex-shrink-0 transition-opacity ${isEmpty ? "opacity-30" : ""}`}>
+    <div className="w-52 flex-shrink-0">
       <div className={`flex items-center justify-between mb-2 px-1 py-1.5 rounded-lg ${config.badge} bg-opacity-60`}>
         <span className="text-xs font-bold truncate">{config.label}</span>
         <span className="text-xs tabular-nums font-semibold ml-1 flex-shrink-0">
           {columna.cards.length}
         </span>
       </div>
-      <div className="space-y-2 min-h-[3rem]">
+      <div className="space-y-2">
         {columna.cards.map((card) => (
           <Card key={card.id} card={card} estado={columna.estado as EstadoProyecto} />
         ))}
-        {isEmpty && (
-          <div className="h-16 border-2 border-dashed border-gray-100 rounded-lg" />
-        )}
       </div>
     </div>
   );
@@ -98,7 +109,7 @@ function Card({
         </span>
         {card.fechaCompromiso && (
           <span className="text-[10px] text-gray-400 tabular-nums">
-            📅 {formatDate(card.fechaCompromiso)}
+            {formatDate(card.fechaCompromiso)}
           </span>
         )}
       </div>

@@ -1,6 +1,5 @@
 import { db } from "@/lib/db";
 import type { CategoriaCompra, TipoCompra, Prisma } from "@prisma/client";
-import type { Decimal } from "@prisma/client/runtime/library";
 
 export type CompraRow = {
   id: string;
@@ -15,9 +14,9 @@ export type CompraRow = {
   numeroCFDIRecibido: string | null;
   proyecto: { id: string; codigo: string; nombre: string } | null;
   // OWNER-only
-  importe: Decimal | null;
-  iva: Decimal | null;
-  total: Decimal | null;
+  importe: string | null;
+  iva: string | null;
+  total: string | null;
 };
 
 export type FiltrosCompras = {
@@ -84,9 +83,9 @@ export async function listarCompras(
     metodoPago: c.metodoPago,
     numeroCFDIRecibido: owner ? c.numeroCFDIRecibido : null,
     proyecto: c.proyecto,
-    importe: owner ? c.importe : null,
-    iva: owner ? c.iva : null,
-    total: owner ? c.total : null,
+    importe: owner ? c.importe.toString() : null,
+    iva: owner ? c.iva.toString() : null,
+    total: owner ? c.total.toString() : null,
   }));
 }
 

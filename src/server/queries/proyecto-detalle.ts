@@ -1,4 +1,3 @@
-"use server";
 
 import { db } from "@/lib/db";
 import type {
@@ -15,7 +14,6 @@ import type {
   TipoEvento,
   EstatusPago,
 } from "@prisma/client";
-import type { Decimal } from "@prisma/client/runtime/library";
 
 // ===== TIPOS DE DETALLE =====
 
@@ -41,16 +39,16 @@ export type CompraDetalle = {
   descripcion: string;
   categoria: CategoriaCompra;
   tipo: TipoCompra;
-  importe: Decimal | null;
-  iva: Decimal | null;
-  total: Decimal | null;
+  importe: string | null;
+  iva: string | null;
+  total: string | null;
   numeroCFDIRecibido: string | null;
 };
 
 export type AnticipoDetalle = {
   id: string;
-  monto: Decimal;
-  porcentaje: Decimal | null;
+  monto: string;
+  porcentaje: string | null;
   fecha: Date;
   metodoPago: string;
   cfdiEmitido: boolean;
@@ -59,7 +57,7 @@ export type AnticipoDetalle = {
 
 export type PagoDetalle = {
   id: string;
-  monto: Decimal;
+  monto: string;
   fecha: Date;
   metodoPago: string;
   estatus: EstatusPago;
@@ -70,8 +68,8 @@ export type PagoDetalle = {
 
 export type RevisionDetalle = {
   id: string;
-  montoAnterior: Decimal;
-  montoNuevo: Decimal;
+  montoAnterior: string;
+  montoNuevo: string;
   motivo: string;
   fecha: Date;
   cambiadoPor: { name: string } | null;
@@ -107,7 +105,7 @@ export type ProyectoDetalle = {
   compras: CompraDetalle[];
   eventos: EventoDetalle[];
   // OWNER-only (null para ENCARGADO)
-  montoVendido: Decimal | null;
+  montoVendido: string | null;
   ivaIncluido: boolean | null;
   facturado: boolean | null;
   numeroCFDI: string | null;
@@ -245,14 +243,14 @@ export async function obtenerProyecto(
       descripcion: c.descripcion,
       categoria: c.categoria,
       tipo: c.tipo,
-      importe: owner ? c.importe : null,
-      iva: owner ? c.iva : null,
-      total: owner ? c.total : null,
+      importe: owner ? c.importe.toString() : null,
+      iva: owner ? c.iva.toString() : null,
+      total: owner ? c.total.toString() : null,
       numeroCFDIRecibido: owner ? c.numeroCFDIRecibido : null,
     })),
     eventos: p.eventos,
     // OWNER-only
-    montoVendido: owner ? p.montoVendido : null,
+    montoVendido: owner ? p.montoVendido.toString() : null,
     ivaIncluido: owner ? p.ivaIncluido : null,
     facturado: owner ? p.facturado : null,
     numeroCFDI: owner ? p.numeroCFDI : null,
@@ -261,8 +259,22 @@ export async function obtenerProyecto(
     metodoPago: owner ? p.metodoPago : null,
     formaPago: owner ? p.formaPago : null,
     fechaFacturacion: owner ? p.fechaFacturacion : null,
-    anticipos: owner ? p.anticipos : null,
-    pagos: owner ? p.pagos : null,
-    revisiones: owner ? p.revisiones : null,
+    anticipos: owner
+      ? p.anticipos.map((a) => ({
+          ...a,
+          monto: a.monto.toString(),
+          porcentaje: a.porcentaje?.toString() ?? null,
+        }))
+      : null,
+    pagos: owner
+      ? p.pagos.map((pg) => ({ ...pg, monto: pg.monto.toString() }))
+      : null,
+    revisiones: owner
+      ? p.revisiones.map((r) => ({
+          ...r,
+          montoAnterior: r.montoAnterior.toString(),
+          montoNuevo: r.montoNuevo.toString(),
+        }))
+      : null,
   };
 }

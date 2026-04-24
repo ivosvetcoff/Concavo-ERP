@@ -1,5 +1,3 @@
-"use server";
-
 import { db } from "@/lib/db";
 import { ConceptoGastoFijo } from "@prisma/client";
 import type { Decimal } from "@prisma/client/runtime/library";

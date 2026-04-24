@@ -28,6 +28,7 @@ const COLORES: Record<EstadoProyecto, string> = {
 
 type Props = {
   kanban: KanbanColumna[];
+  entregadosMes: number;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -45,14 +46,22 @@ const CustomTooltip = ({ active, payload }: any) => {
   return null;
 };
 
-export function GraficoEstados({ kanban }: Props) {
+export function GraficoEstados({ kanban, entregadosMes }: Props) {
   const data = kanban
     .filter((c) => c.cards.length > 0)
     .map((c) => ({
       name: estadoProyectoConfig[c.estado as EstadoProyecto].label,
       value: c.cards.length,
-      estado: c.estado,
+      estado: c.estado as EstadoProyecto,
     }));
+
+  if (entregadosMes > 0) {
+    data.push({
+      name: estadoProyectoConfig["ENTREGADO"].label,
+      value: entregadosMes,
+      estado: "ENTREGADO",
+    });
+  }
 
   const total = data.reduce((acc, d) => acc + d.value, 0);
 

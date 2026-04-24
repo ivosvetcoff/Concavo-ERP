@@ -6,10 +6,7 @@ export async function getAuthUser() {
   const { userId } = await auth();
   if (!userId) return null;
 
-  const user = await db.user.findUnique({
-    where: { clerkId: userId },
-  });
-
+  const user = await db.user.findUnique({ where: { clerkId: userId } });
   return user;
 }
 
@@ -54,7 +51,7 @@ export async function syncUser() {
       clerkId: clerkUser.id,
       email,
       name,
-      role: "ENCARGADO",
+      role: "OWNER",
     },
   });
 

@@ -74,7 +74,7 @@ export type DashboardAlertas = {
   comprasSinAsignar: number;
 };
 
-export async function obtenerDashboard(): Promise<{
+export async function obtenerDashboard(mes?: number, anio?: number): Promise<{
   kpis: DashboardKPIs;
   kanban: KanbanColumna[];
   heatmap: HeatmapBucket[];
@@ -82,8 +82,11 @@ export async function obtenerDashboard(): Promise<{
   alertas: DashboardAlertas;
 }> {
   const ahora = toZonedTime(new Date(), TIMEZONE);
-  const inicioMes = startOfMonth(ahora);
-  const finMes = endOfMonth(ahora);
+  const mesRef = mes ?? (ahora.getMonth() + 1);
+  const anioRef = anio ?? ahora.getFullYear();
+  const refDate = new Date(anioRef, mesRef - 1, 15);
+  const inicioMes = startOfMonth(refDate);
+  const finMes = endOfMonth(refDate);
 
   const [
     proyectosActivosCount,

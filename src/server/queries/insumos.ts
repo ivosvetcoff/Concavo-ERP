@@ -1,4 +1,3 @@
-"use server";
 
 import { db } from "@/lib/db";
 import type { Prisma, UnidadCompra } from "@prisma/client";
