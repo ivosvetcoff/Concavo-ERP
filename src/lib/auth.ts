@@ -7,6 +7,10 @@ export async function getAuthUser() {
   if (!userId) return null;
 
   const user = await db.user.findUnique({ where: { clerkId: userId } });
+  if (!user) {
+    // Webhook no disparado aún — sincronizar en el primer acceso
+    return await syncUser();
+  }
   return user;
 }
 

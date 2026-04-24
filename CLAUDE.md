@@ -294,7 +294,8 @@ Decisión guiada por: **un solo dev programa todo**. Cada pieza extra del stack 
 - **Command palette:** shadcn `Command`.
 - **Fechas:** date-fns + date-fns-tz (timezone `America/Mexico_City`).
 - **Dinero:** Prisma `Decimal`. Nunca floats. En frontend, `decimal.js` o strings controlados.
-- **Gantt:** `frappe-gantt` o `dhtmlx-gantt` community. No construir desde cero.
+- **Charts:** `recharts` (KPIs, gráficos de estados, gráficos de procesos en dashboard).
+- **Gantt:** `frappe-gantt`. CSS en `src/styles/frappe-gantt.css` — importar en el componente que lo usa. No construir desde cero.
 - **Exportes:** `exceljs` (con fórmulas en celdas, no solo valores), `@react-pdf/renderer` o `pdf-lib`.
 - **Email:** Resend (Fase 2).
 - **Deploy:** Vercel + Neon (Postgres serverless).
@@ -644,6 +645,7 @@ generator client {
 
 model User {
   id              String             @id @default(cuid())
+  clerkId         String             @unique           // Clerk user ID
   email           String             @unique
   name            String
   role            Role               @default(ENCARGADO)
@@ -1549,7 +1551,7 @@ Leer esta sección antes de cualquier modificación al código.
 
 ### Biblioteca de componentes UI — patrón `render` (NO `asChild`)
 
-Este proyecto usa `@base-ui/react` (no shadcn/radix estándar). Los componentes como `DialogTrigger`, `PopoverTrigger`, `DialogClose` usan la prop `render` en lugar de `asChild`:
+Este proyecto usa `@base-ui/react` (no shadcn/radix estándar). Los componentes como `DialogTrigger`, `SheetTrigger`, `PopoverTrigger`, `DialogClose` usan la prop `render` en lugar de `asChild`. `Sheet` está implementado como un `Dialog` lateral (usa `@base-ui/react/dialog` internamente):
 
 ```tsx
 // ✅ Correcto
@@ -1602,8 +1604,13 @@ Clerk maneja la sesión. El `userId` de Clerk se guarda en `User.clerkId` (campo
 | M10 Command Palette | global (Cmd+K) | ✅ Completo |
 | M11 Dashboard | `/dashboard` | ✅ Completo |
 | Cálculos utilidad | `src/server/calculations/` | ✅ Con 25 tests |
+| M12 Gantt | `/gantt` | ✅ Completo (OWNER-only) |
+| M13 Nómina | `/nomina` | ✅ Completo (OWNER-only) |
+| M14 RRHH | `/rrhh` | ✅ Completo |
+| M18 Ocupación taller | `/ocupacion` | ✅ Completo |
+| Tipo de cambio | `/tipocambio` | ✅ Completo |
 
-**Todos los módulos de Fase 1 están implementados.** Próximo foco: mejoras y ajustes sobre lo existente según feedback del cliente, y módulos de Fase 2 (M12 Gantt, M13 Nómina, M14 RRHH).
+**Todos los módulos de Fase 1 y la mayoría de Fase 2 están implementados.** Próximo foco: mejoras y ajustes sobre lo existente según feedback del cliente.
 
 ### Patrón de server action
 
