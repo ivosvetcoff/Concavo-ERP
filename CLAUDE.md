@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 > Documento de contexto maestro para el proyecto. Leer completo antes de escribir código.
 > Este archivo es la fuente de verdad. Si algo en el código contradice este documento, este documento manda (y se actualiza después).
-> Versión: 6. Cambios significativos respecto a v5 documentados en sección 21.
+> Versión: 7. Fase 1 completa. Ver sección 20 para estado actual de módulos.
 
 ---
 
@@ -1593,17 +1593,17 @@ Clerk maneja la sesión. El `userId` de Clerk se guarda en `User.clerkId` (campo
 | M1 Proyectos | `/proyectos` | ✅ Completo |
 | M2 Muebles / WIP | tabs de `/proyectos/[id]` | ✅ Completo |
 | M3 Compras | `/compras` | ✅ Completo |
+| M4 Insumos | `/insumos` | ✅ Completo |
+| M5 Gastos fijos | `/gastos` | ✅ Completo |
 | M6 Anticipos | tab en `/proyectos/[id]` | ✅ Completo |
 | M7 Empleados | `/empleados` | ✅ Completo |
+| M8 Producción semanal | `/produccion` | ✅ Completo |
+| M9 Cierre mensual | `/cierre` | ✅ Completo |
 | M10 Command Palette | global (Cmd+K) | ✅ Completo |
+| M11 Dashboard | `/dashboard` | ✅ Completo |
 | Cálculos utilidad | `src/server/calculations/` | ✅ Con 25 tests |
-| M4 Insumos | `/insumos` | 🔲 Stub — próximo |
-| M5 Gastos fijos | `/gastos` | 🔲 Stub — próximo |
-| M8 Producción semanal | `/produccion` | 🔲 Stub |
-| M9 Cierre mensual | `/cierre` | 🔲 Stub |
-| M11 Dashboard | `/dashboard` | 🔲 Stub |
 
-Los stubs son páginas vacías. El orden recomendado para implementar: M4+M5 → M8 → M9 → M11.
+**Todos los módulos de Fase 1 están implementados.** Próximo foco: mejoras y ajustes sobre lo existente según feedback del cliente, y módulos de Fase 2 (M12 Gantt, M13 Nómina, M14 RRHH).
 
 ### Patrón de server action
 
