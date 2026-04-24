@@ -33,9 +33,20 @@ export type KanbanColumna = {
   cards: KanbanCard[];
 };
 
+export type HeatmapMuebleCard = {
+  id: string;
+  nombre: string;
+  proyectoId: string;
+  proyectoCodigo: string;
+  proyectoNombre: string;
+  clienteNombre: string;
+  semaforo: Semaforo;
+};
+
 export type HeatmapBucket = {
   proceso: string | null;
   count: number;
+  muebles: HeatmapMuebleCard[];
 };
 
 export type ActividadItem = {
@@ -141,10 +152,23 @@ export async function obtenerDashboard(mes?: number, anio?: number): Promise<{
       },
       orderBy: [{ fechaCompromiso: "asc" }],
     }),
-    db.mueble.groupBy({
-      by: ["procesoActual"],
+    db.mueble.findMany({
       where: { proyecto: { estado: { in: ESTADOS_KANBAN } } },
-      _count: { _all: true },
+      select: {
+        id: true,
+        nombre: true,
+        procesoActual: true,
+        proyecto: {
+          select: {
+            id: true,
+            codigo: true,
+            nombre: true,
+            semaforo: true,
+            cliente: { select: { nombre: true } },
+          },
+        },
+      },
+      orderBy: { proyecto: { codigo: "asc" } },
     }),
     db.eventoProyecto.findMany({
       take: 20,
@@ -209,9 +233,24 @@ export async function obtenerDashboard(mes?: number, anio?: number): Promise<{
   }));
 
   // Heatmap
-  const heatmap: HeatmapBucket[] = mueblesPorProceso.map((g) => ({
-    proceso: g.procesoActual,
-    count: g._count._all,
+  const mueblesPorProcesoMap = new Map<string, HeatmapMuebleCard[]>();
+  for (const m of mueblesPorProceso) {
+    const key = m.procesoActual ?? "__null__";
+    if (!mueblesPorProcesoMap.has(key)) mueblesPorProcesoMap.set(key, []);
+    mueblesPorProcesoMap.get(key)!.push({
+      id: m.id,
+      nombre: m.nombre,
+      proyectoId: m.proyecto.id,
+      proyectoCodigo: m.proyecto.codigo,
+      proyectoNombre: m.proyecto.nombre,
+      clienteNombre: m.proyecto.cliente.nombre,
+      semaforo: m.proyecto.semaforo,
+    });
+  }
+  const heatmap: HeatmapBucket[] = [...mueblesPorProcesoMap.entries()].map(([key, muebles]) => ({
+    proceso: key === "__null__" ? null : key,
+    count: muebles.length,
+    muebles,
   }));
 
   // Alertas
