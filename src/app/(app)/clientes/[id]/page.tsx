@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { estadoProyectoConfig, semaforoConfig } from "@/lib/status-colors";
 import { formatDate, formatMXN } from "@/lib/format";
 import Decimal from "decimal.js";
+import { ClienteSheet } from "@/components/features/clientes/ClienteSheet";
 
 export default async function ClienteDetallePage({
   params,
@@ -60,11 +61,14 @@ export default async function ClienteDetallePage({
 
       {/* Header */}
       <div className="bg-white border rounded-xl p-5 space-y-3">
-        <div>
-          <h1 className="text-2xl font-semibold text-gray-900">{cliente.nombre}</h1>
-          {cliente.razonSocial && (
-            <p className="text-sm text-gray-400 mt-0.5">{cliente.razonSocial}</p>
-          )}
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900">{cliente.nombre}</h1>
+            {cliente.razonSocial && (
+              <p className="text-sm text-gray-400 mt-0.5">{cliente.razonSocial}</p>
+            )}
+          </div>
+          <ClienteSheet mode="editar" cliente={cliente} />
         </div>
         <div className="flex flex-wrap gap-4 text-sm text-gray-600">
           {cliente.rfc && (

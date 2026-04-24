@@ -18,11 +18,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { clienteSchema, type ClienteInput } from "@/schemas/cliente";
 import { crearCliente, actualizarCliente } from "@/server/actions/clientes";
-import type { ClienteRow } from "@/server/queries/clientes";
+
+type ClienteEditData = {
+  id: string;
+  nombre: string;
+  contacto: string | null;
+  telefono: string | null;
+  email: string | null;
+  rfc: string | null;
+  razonSocial: string | null;
+  usoCFDIDefault: string | null;
+  notas: string | null;
+};
 
 type Props =
   | { mode: "crear" }
-  | { mode: "editar"; cliente: ClienteRow };
+  | { mode: "editar"; cliente: ClienteEditData };
 
 export function ClienteSheet(props: Props) {
   const router = useRouter();

@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import Decimal from "decimal.js";
 import type { EstadoProyecto, Semaforo } from "@prisma/client";
+import { calcularSemaforoAuto } from "@/lib/semaforo";
 
 export type ClienteRow = {
   id: string;
@@ -59,6 +60,7 @@ export type ClienteDetalle = {
   email: string | null;
   rfc: string | null;
   notas: string | null;
+  usoCFDIDefault: string | null;
   proyectos: ClienteDetalleProyecto[];
 };
 
@@ -74,6 +76,7 @@ export async function obtenerClienteDetalle(id: string, owner: boolean): Promise
       email: true,
       rfc: true,
       notas: true,
+      usoCFDIDefault: true,
       proyectos: {
         orderBy: [{ estado: "asc" }, { fechaCompromiso: "asc" }],
         select: {
@@ -87,6 +90,7 @@ export async function obtenerClienteDetalle(id: string, owner: boolean): Promise
           qtyItems: true,
           montoVendido: true,
           facturado: true,
+          semaforoManual: true,
           anticipos: { select: { monto: true } },
           pagos: { select: { monto: true } },
         },
@@ -105,12 +109,13 @@ export async function obtenerClienteDetalle(id: string, owner: boolean): Promise
     email: c.email,
     rfc: c.rfc,
     notas: c.notas,
+    usoCFDIDefault: c.usoCFDIDefault,
     proyectos: c.proyectos.map((p) => ({
       id: p.id,
       codigo: p.codigo,
       nombre: p.nombre,
       estado: p.estado,
-      semaforo: p.semaforo,
+      semaforo: p.semaforoManual ? p.semaforo : calcularSemaforoAuto(p.fechaCompromiso, p.estado),
       fechaCompromiso: p.fechaCompromiso,
       fechaEntrega: p.fechaEntrega,
       qtyItems: p.qtyItems,

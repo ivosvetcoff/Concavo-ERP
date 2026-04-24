@@ -57,6 +57,15 @@ export function ComprasTabla({ compras, proyectos, isOwner, filtrosActivos }: Pr
     ? compras.reduce((acc, c) => acc + parseFloat((c.total ?? 0).toString()), 0)
     : null;
 
+  const totalesCat = isOwner
+    ? (["MDF", "SOLIDO", "COMPLEMENTOS", "ENVIOS"] as const).map((cat) => ({
+        cat,
+        total: compras
+          .filter((c) => c.categoria === cat)
+          .reduce((acc, c) => acc + parseFloat((c.total ?? 0).toString()), 0),
+      })).filter((x) => x.total > 0)
+    : null;
+
   return (
     <div className="space-y-4">
       {/* Filtros */}
@@ -231,6 +240,23 @@ export function ComprasTabla({ compras, proyectos, isOwner, filtrosActivos }: Pr
                 </tr>
               ))}
             </tbody>
+            {isOwner && totalGeneral !== null && compras.length > 0 && (
+              <tfoot>
+                <tr className="bg-gray-50 border-t-2 border-gray-200">
+                  <td colSpan={7} className="px-3 py-2 text-xs text-gray-500 text-right">
+                    {totalesCat?.map(({ cat, total }) => (
+                      <span key={cat} className="mr-4">
+                        <span className="text-gray-400">{CATEGORIA_LABEL[cat]}:</span>{" "}
+                        <span className="font-medium text-gray-700">{formatMXN(total.toString())}</span>
+                      </span>
+                    ))}
+                  </td>
+                  <td className="px-3 py-2 text-right font-bold text-gray-900 tabular-nums">
+                    {formatMXN(totalGeneral.toString())}
+                  </td>
+                </tr>
+              </tfoot>
+            )}
           </table>
         </div>
       )}

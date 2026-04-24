@@ -1,6 +1,7 @@
 
 import { db } from "@/lib/db";
 import type { EstadoProyecto, Semaforo } from "@prisma/client";
+import { calcularSemaforoAuto } from "@/lib/semaforo";
 
 export type ProyectoRow = {
   id: string;
@@ -59,6 +60,7 @@ export async function listarProyectos(
       fechaEntrega: true,
       estado: true,
       semaforo: true,
+      semaforoManual: true,
       tieneHC: true,
       comentarios: true,
       montoVendido: true,
@@ -71,6 +73,7 @@ export async function listarProyectos(
   return proyectos.map((p) => ({
     ...p,
     cliente: p.cliente.nombre,
+    semaforo: p.semaforoManual ? p.semaforo : calcularSemaforoAuto(p.fechaCompromiso, p.estado),
     montoVendido: owner ? p.montoVendido.toString() : null,
     facturado: owner ? p.facturado : null,
   }));
