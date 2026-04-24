@@ -109,7 +109,7 @@ export function ClientesTabla({ clientes }: Props) {
                     <td className="py-2.5 px-3">
                       {c._count.proyectos > 0 ? (
                         <a
-                          href={`/proyectos?cliente=${c.id}`}
+                          href={`/clientes/${c.id}`}
                           className="inline-flex items-center gap-1 text-indigo-600 hover:underline text-xs"
                         >
                           <FolderOpen className="h-3 w-3" />
