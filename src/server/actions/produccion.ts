@@ -30,11 +30,13 @@ export async function upsertRegistro(data: unknown) {
       semana,
       horasTO: parsed.horasTO,
       horasTE: parsed.horasTE,
+      esCompensatorio: parsed.esCompensatorio,
       notas: parsed.notas || null,
     },
     update: {
       horasTO: parsed.horasTO,
       horasTE: parsed.horasTE,
+      esCompensatorio: parsed.esCompensatorio,
       notas: parsed.notas || null,
     },
   });

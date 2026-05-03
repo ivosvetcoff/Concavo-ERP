@@ -141,10 +141,14 @@ model Proyecto {
   qtyItems        Int                @default(0)
   montoVendido    Decimal            @db.Decimal(12, 2)
   ivaIncluido     Boolean            @default(true)
-  moneda          Moneda             @default(MXN)
-  tipoCambioVenta Decimal?           @db.Decimal(12, 4)
-  tieneHC         Boolean            @default(false)
   comentarios     String?
+
+  /// @deprecated v8 — multi-moneda eliminada. Concavo solo MXN.
+  moneda          Moneda             @default(MXN)
+  /// @deprecated v8
+  tipoCambioVenta Decimal?           @db.Decimal(12, 4)
+  /// @deprecated v8 — Hoja de Control eliminada del flujo real.
+  tieneHC         Boolean            @default(false)
 
   facturado        Boolean     @default(false)
   numeroCFDI       String?
@@ -160,6 +164,7 @@ model Proyecto {
   pagos      PagoProyecto[]
   revisiones ProyectoRevision[]
   eventos    EventoProyecto[]
+  plan       PlanProyecto?
   createdAt  DateTime           @default(now())
   updatedAt  DateTime           @updatedAt
 
@@ -202,6 +207,22 @@ enum MetodoPago {
   PPD
 }
 
+// ===== PLAN DEL PROYECTO (v8 — alimenta Gantt automático) =====
+
+model PlanProyecto {
+  id                 String   @id @default(cuid())
+  proyectoId         String   @unique
+  proyecto           Proyecto @relation(fields: [proyectoId], references: [id], onDelete: Cascade)
+  fechaInicio        DateTime
+  fechaFinEst        DateTime
+  fechaFinReal       DateTime?
+  horasTotalesEst    Decimal  @db.Decimal(8, 2)
+  horasTotalesReales Decimal  @db.Decimal(8, 2) @default(0)
+  bloqueado          Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
 // ===== MUEBLES =====
 
 model Mueble {
@@ -220,6 +241,15 @@ model Mueble {
   estadoItem       EstadoItem         @default(ESPERA)
   procesoActual    ProcesoTecnico?
   especificaciones Json?
+
+  // ===== Horas estimadas por proceso (v8) =====
+  horasEstimadasHabilitado   Decimal? @db.Decimal(6, 2)
+  horasEstimadasArmado       Decimal? @db.Decimal(6, 2)
+  horasEstimadasPulido       Decimal? @db.Decimal(6, 2)
+  horasEstimadasLaca         Decimal? @db.Decimal(6, 2)
+  horasEstimadasComplementos Decimal? @db.Decimal(6, 2)
+  horasEstimadasEmpaque      Decimal? @db.Decimal(6, 2)
+
   historialProceso MuebleProcesoLog[]
   tareas           Tarea[]
   registros        RegistroProduccion[]
@@ -335,11 +365,12 @@ model RegistroProduccion {
   mueble     Mueble         @relation(fields: [muebleId], references: [id], onDelete: Cascade)
   proceso    ProcesoTecnico
   semana     DateTime
-  horasTO    Decimal        @db.Decimal(6, 2) @default(0)
-  horasTE    Decimal        @db.Decimal(6, 2) @default(0)
-  notas      String?
-  createdAt  DateTime       @default(now())
-  updatedAt  DateTime       @updatedAt
+  horasTO         Decimal  @db.Decimal(6, 2) @default(0)
+  horasTE         Decimal  @db.Decimal(6, 2) @default(0)
+  esCompensatorio Boolean  @default(false)
+  notas           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@unique([empleadoId, muebleId, proceso, semana])
   @@index([semana])
@@ -387,6 +418,7 @@ enum TipoEvento {
   PAGO_RECIBIDO
   COMPRA_REGISTRADA
   FACTURADO
+  REPLANIFICACION
   COMENTARIO
   OTRO
 }

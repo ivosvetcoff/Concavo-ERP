@@ -13,6 +13,7 @@ export type RegistroRow = {
   proceso: ProcesoTecnico;
   horasTO: string;
   horasTE: string;
+  esCompensatorio: boolean;
   notas: string | null;
 };
 
@@ -76,6 +77,7 @@ export async function obtenerPlanillaSemana(semana: Date): Promise<{
             proceso: true,
             horasTO: true,
             horasTE: true,
+            esCompensatorio: true,
             notas: true,
             mueble: {
               select: {
@@ -124,6 +126,7 @@ export async function obtenerPlanillaSemana(semana: Date): Promise<{
         proceso: r.proceso,
         horasTO: r.horasTO.toString(),
         horasTE: r.horasTE.toString(),
+        esCompensatorio: r.esCompensatorio,
         notas: r.notas,
       })),
     }));

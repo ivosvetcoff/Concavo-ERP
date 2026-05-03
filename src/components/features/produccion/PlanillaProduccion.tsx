@@ -165,9 +165,16 @@ function EmpleadoCard({
                 </td>
                 <td className="py-2.5 px-3 text-center text-sm tabular-nums">
                   {parseFloat(r.horasTE) > 0 ? (
-                    <span className="font-medium text-amber-600">
-                      {formatHoras(parseFloat(r.horasTE))}h
-                    </span>
+                    <div className="flex flex-col items-center gap-0.5">
+                      <span className="font-medium text-amber-600">
+                        {formatHoras(parseFloat(r.horasTE))}h
+                      </span>
+                      {r.esCompensatorio && (
+                        <span className="text-[9px] px-1 py-0.5 rounded bg-amber-100 text-amber-700 leading-none">
+                          Comp.
+                        </span>
+                      )}
+                    </div>
                   ) : (
                     <span className="text-gray-300">—</span>
                   )}

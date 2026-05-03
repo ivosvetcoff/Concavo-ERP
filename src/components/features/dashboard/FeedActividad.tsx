@@ -13,6 +13,7 @@ const iconoEvento: Record<TipoEvento, string> = {
   PAGO_RECIBIDO: "💵",
   COMPRA_REGISTRADA: "🛒",
   FACTURADO: "🧾",
+  REPLANIFICACION: "📅",
   COMENTARIO: "💬",
   OTRO: "•",
 };

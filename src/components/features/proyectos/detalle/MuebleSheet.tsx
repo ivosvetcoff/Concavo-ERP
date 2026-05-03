@@ -76,6 +76,12 @@ const formSchema = z.object({
   cantidad: z.coerce.number().int().min(1, "Mínimo 1"),
   madera: z.string().optional(),
   notasTerceros: z.string().optional(),
+  horasEstimadasHabilitado: z.coerce.number().min(0).max(999).optional().nullable(),
+  horasEstimadasArmado: z.coerce.number().min(0).max(999).optional().nullable(),
+  horasEstimadasPulido: z.coerce.number().min(0).max(999).optional().nullable(),
+  horasEstimadasLaca: z.coerce.number().min(0).max(999).optional().nullable(),
+  horasEstimadasComplementos: z.coerce.number().min(0).max(999).optional().nullable(),
+  horasEstimadasEmpaque: z.coerce.number().min(0).max(999).optional().nullable(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -111,6 +117,12 @@ export function MuebleSheet({ proyectoId, mueble }: Props) {
         cantidad: mueble?.cantidad ?? 1,
         madera: mueble?.madera ?? "",
         notasTerceros: mueble?.notasTerceros ?? "",
+        horasEstimadasHabilitado: mueble?.horasEstimadasHabilitado != null ? Number(mueble.horasEstimadasHabilitado) : undefined,
+        horasEstimadasArmado: mueble?.horasEstimadasArmado != null ? Number(mueble.horasEstimadasArmado) : undefined,
+        horasEstimadasPulido: mueble?.horasEstimadasPulido != null ? Number(mueble.horasEstimadasPulido) : undefined,
+        horasEstimadasLaca: mueble?.horasEstimadasLaca != null ? Number(mueble.horasEstimadasLaca) : undefined,
+        horasEstimadasComplementos: mueble?.horasEstimadasComplementos != null ? Number(mueble.horasEstimadasComplementos) : undefined,
+        horasEstimadasEmpaque: mueble?.horasEstimadasEmpaque != null ? Number(mueble.horasEstimadasEmpaque) : undefined,
       });
       setTerceros((mueble?.terceros as TipoTercero[]) ?? []);
       setProceso(mueble?.procesoActual ?? PROCESO_NONE);
@@ -131,6 +143,14 @@ export function MuebleSheet({ proyectoId, mueble }: Props) {
       proceso === PROCESO_NONE ? undefined : (proceso as ProcesoTecnico);
     const estructuraVal =
       estructura === ESTRUCTURA_NONE ? null : (estructura as Estructura);
+    const horas = {
+      horasEstimadasHabilitado: values.horasEstimadasHabilitado ?? null,
+      horasEstimadasArmado: values.horasEstimadasArmado ?? null,
+      horasEstimadasPulido: values.horasEstimadasPulido ?? null,
+      horasEstimadasLaca: values.horasEstimadasLaca ?? null,
+      horasEstimadasComplementos: values.horasEstimadasComplementos ?? null,
+      horasEstimadasEmpaque: values.horasEstimadasEmpaque ?? null,
+    };
     try {
       if (isEdit && mueble) {
         await actualizarMueble({
@@ -144,6 +164,7 @@ export function MuebleSheet({ proyectoId, mueble }: Props) {
           estructura: estructuraVal,
           estadoItem,
           procesoActual: procesoActual ?? null,
+          ...horas,
         });
         toast.success("Mueble actualizado");
       } else {
@@ -157,6 +178,7 @@ export function MuebleSheet({ proyectoId, mueble }: Props) {
           estructura: estructuraVal,
           estadoItem,
           procesoActual,
+          ...horas,
         });
         toast.success("Mueble agregado");
       }
@@ -328,6 +350,36 @@ export function MuebleSheet({ proyectoId, mueble }: Props) {
               />
             </div>
           )}
+
+          <details className="border rounded-lg">
+            <summary className="px-4 py-3 text-sm font-medium cursor-pointer select-none text-gray-700 hover:bg-gray-50 rounded-lg">
+              Horas estimadas por proceso
+              <span className="ml-1.5 text-xs font-normal text-gray-400">(opcional — se usan para el Gantt)</span>
+            </summary>
+            <div className="px-4 pb-4 pt-2 grid grid-cols-2 gap-3">
+              {([
+                { key: "horasEstimadasHabilitado", label: "Habilitado" },
+                { key: "horasEstimadasArmado", label: "Armado" },
+                { key: "horasEstimadasPulido", label: "Pulido" },
+                { key: "horasEstimadasLaca", label: "Laca" },
+                { key: "horasEstimadasComplementos", label: "Complementos" },
+                { key: "horasEstimadasEmpaque", label: "Empaque" },
+              ] as const).map(({ key, label }) => (
+                <div key={key} className="space-y-1">
+                  <Label htmlFor={key} className="text-xs">{label}</Label>
+                  <Input
+                    id={key}
+                    type="number"
+                    step="0.5"
+                    min="0"
+                    placeholder="0"
+                    className="h-8 text-sm"
+                    {...register(key)}
+                  />
+                </div>
+              ))}
+            </div>
+          </details>
 
           <Button type="submit" disabled={loading} className="w-full mt-2">
             {loading

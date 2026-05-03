@@ -1,6 +1,15 @@
 import { z } from "zod";
 import { ProcesoTecnico, TipoTercero, EstadoItem, Estructura } from "@prisma/client";
 
+const horasEstimadasFields = {
+  horasEstimadasHabilitado: z.coerce.number().min(0).max(999).nullable().optional(),
+  horasEstimadasArmado: z.coerce.number().min(0).max(999).nullable().optional(),
+  horasEstimadasPulido: z.coerce.number().min(0).max(999).nullable().optional(),
+  horasEstimadasLaca: z.coerce.number().min(0).max(999).nullable().optional(),
+  horasEstimadasComplementos: z.coerce.number().min(0).max(999).nullable().optional(),
+  horasEstimadasEmpaque: z.coerce.number().min(0).max(999).nullable().optional(),
+};
+
 export const crearMuebleSchema = z.object({
   proyectoId: z.string().cuid(),
   orden: z.string().max(20).optional().or(z.literal("")),
@@ -14,6 +23,7 @@ export const crearMuebleSchema = z.object({
   notasTerceros: z.string().max(300).optional().or(z.literal("")),
   estadoItem: z.nativeEnum(EstadoItem).optional(),
   procesoActual: z.nativeEnum(ProcesoTecnico).optional(),
+  ...horasEstimadasFields,
 });
 
 export const actualizarMuebleSchema = z.object({
@@ -29,6 +39,7 @@ export const actualizarMuebleSchema = z.object({
   notasTerceros: z.string().max(300).optional().or(z.literal("")),
   estadoItem: z.nativeEnum(EstadoItem).optional(),
   procesoActual: z.nativeEnum(ProcesoTecnico).nullable().optional(),
+  ...horasEstimadasFields,
 });
 
 export const eliminarMuebleSchema = z.object({

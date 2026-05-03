@@ -25,7 +25,7 @@ import { Separator } from "@/components/ui/separator";
 import { estadoProyectoConfig, semaforoConfig } from "@/lib/status-colors";
 import { formatDate, formatMXN } from "@/lib/format";
 import { cambiarEstadoProyecto, ajustarMonto } from "@/server/actions/proyectos";
-import { CheckCircle2, Pencil, Calendar, DollarSign } from "lucide-react";
+import { Pencil, Calendar, DollarSign } from "lucide-react";
 import type { ProyectoDetalle } from "@/server/queries/proyecto-detalle";
 import type { EstadoProyecto } from "@prisma/client";
 
@@ -92,12 +92,7 @@ export function HeaderProyecto({ proyecto, isOwner }: Props) {
           <Badge variant="outline" className={semaforoCfg.badge}>
             {semaforoCfg.label}
           </Badge>
-          {proyecto.tieneHC && (
-            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 gap-1">
-              <CheckCircle2 className="h-3 w-3" />
-              HC
-            </Badge>
-          )}
+
           {isOwner && (
             <Badge
               variant="outline"

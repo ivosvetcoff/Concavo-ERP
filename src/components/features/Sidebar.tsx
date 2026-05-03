@@ -18,7 +18,6 @@ import {
   ClipboardList,
   Activity,
   HeartPulse,
-  DollarSign,
 } from "lucide-react";
 
 
@@ -40,8 +39,6 @@ const navItems = [
   { href: "/empleados", label: "Empleados", icon: UserCheck },
   { href: "/nomina", label: "Nómina", icon: FileText },
   { href: "/rrhh", label: "Recursos Humanos", icon: HeartPulse },
-  // Financiero & Config
-  { href: "/tipocambio", label: "Tipos de Cambio", icon: DollarSign },
 ];
 
 export function Sidebar() {

@@ -37,8 +37,6 @@ export async function crearProyecto(input: CrearProyectoInput) {
       fechaPO: data.fechaPO ?? null,
       fechaCompromiso: data.fechaCompromiso ?? null,
       montoVendido: data.montoVendido,
-      moneda: data.moneda,
-      tieneHC: data.tieneHC,
       comentarios: data.comentarios || null,
       eventos: {
         create: {

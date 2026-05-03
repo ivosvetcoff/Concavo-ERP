@@ -33,6 +33,12 @@ export async function agregarMueble(input: CrearMuebleInput) {
         estadoItem: data.estadoItem ?? "ESPERA",
         procesoActual: data.procesoActual ?? null,
         orden: data.orden || null,
+        horasEstimadasHabilitado: data.horasEstimadasHabilitado ?? null,
+        horasEstimadasArmado: data.horasEstimadasArmado ?? null,
+        horasEstimadasPulido: data.horasEstimadasPulido ?? null,
+        horasEstimadasLaca: data.horasEstimadasLaca ?? null,
+        horasEstimadasComplementos: data.horasEstimadasComplementos ?? null,
+        horasEstimadasEmpaque: data.horasEstimadasEmpaque ?? null,
       },
     });
 
@@ -82,6 +88,12 @@ export async function actualizarMueble(input: ActualizarMuebleInput) {
         notasTerceros: data.notasTerceros || null,
         estadoItem: data.estadoItem ?? muebleAnterior.estadoItem,
         procesoActual: data.procesoActual ?? null,
+        horasEstimadasHabilitado: data.horasEstimadasHabilitado ?? null,
+        horasEstimadasArmado: data.horasEstimadasArmado ?? null,
+        horasEstimadasPulido: data.horasEstimadasPulido ?? null,
+        horasEstimadasLaca: data.horasEstimadasLaca ?? null,
+        horasEstimadasComplementos: data.horasEstimadasComplementos ?? null,
+        horasEstimadasEmpaque: data.horasEstimadasEmpaque ?? null,
       },
     });
 

@@ -8,6 +8,7 @@ export const upsertRegistroSchema = z.object({
   semana: z.coerce.date(),
   horasTO: z.coerce.number().min(0).max(80),
   horasTE: z.coerce.number().min(0).max(80),
+  esCompensatorio: z.boolean().default(false),
   notas: z.string().max(300).optional().or(z.literal("")),
 });
 

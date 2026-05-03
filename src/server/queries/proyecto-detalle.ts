@@ -29,6 +29,12 @@ export type MuebleDetalle = {
   notasTerceros: string | null;
   orden: string | null;
   tareas: { completada: boolean; proceso: ProcesoTecnico }[];
+  horasEstimadasHabilitado: string | null;
+  horasEstimadasArmado: string | null;
+  horasEstimadasPulido: string | null;
+  horasEstimadasLaca: string | null;
+  horasEstimadasComplementos: string | null;
+  horasEstimadasEmpaque: string | null;
 };
 
 // Campos financieros de compra — null para ENCARGADO
@@ -142,6 +148,12 @@ export async function obtenerProyecto(
           terceros: true,
           notasTerceros: true,
           orden: true,
+          horasEstimadasHabilitado: true,
+          horasEstimadasArmado: true,
+          horasEstimadasPulido: true,
+          horasEstimadasLaca: true,
+          horasEstimadasComplementos: true,
+          horasEstimadasEmpaque: true,
           tareas: {
             where: { completada: false },
             orderBy: { updatedAt: "desc" },
@@ -235,7 +247,15 @@ export async function obtenerProyecto(
     createdAt: p.createdAt,
     updatedAt: p.updatedAt,
     cliente: p.cliente,
-    muebles: p.muebles,
+    muebles: p.muebles.map((m) => ({
+      ...m,
+      horasEstimadasHabilitado: m.horasEstimadasHabilitado?.toString() ?? null,
+      horasEstimadasArmado: m.horasEstimadasArmado?.toString() ?? null,
+      horasEstimadasPulido: m.horasEstimadasPulido?.toString() ?? null,
+      horasEstimadasLaca: m.horasEstimadasLaca?.toString() ?? null,
+      horasEstimadasComplementos: m.horasEstimadasComplementos?.toString() ?? null,
+      horasEstimadasEmpaque: m.horasEstimadasEmpaque?.toString() ?? null,
+    })),
     compras: p.compras.map((c) => ({
       id: c.id,
       fecha: c.fecha,

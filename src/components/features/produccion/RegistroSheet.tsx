@@ -74,9 +74,12 @@ export function RegistroSheet({
       semana: new Date(semana + "T00:00:00"),
       horasTO: registro ? parseFloat(registro.horasTO) : 0,
       horasTE: registro ? parseFloat(registro.horasTE) : 0,
+      esCompensatorio: registro?.esCompensatorio ?? false,
       notas: registro?.notas ?? "",
     },
   });
+
+  const horasTE = watch("horasTE");
 
   useEffect(() => {
     if (open) {
@@ -87,6 +90,7 @@ export function RegistroSheet({
         semana: new Date(semana + "T00:00:00"),
         horasTO: registro ? parseFloat(registro.horasTO) : 0,
         horasTE: registro ? parseFloat(registro.horasTE) : 0,
+        esCompensatorio: registro?.esCompensatorio ?? false,
         notas: registro?.notas ?? "",
       });
     }
@@ -201,6 +205,23 @@ export function RegistroSheet({
               )}
             </div>
           </div>
+
+          {/* Compensatorio — solo visible si hay T.E. */}
+          {Number(horasTE) > 0 && (
+            <label className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 cursor-pointer">
+              <input
+                type="checkbox"
+                className="mt-0.5 h-4 w-4 rounded border-gray-300 accent-amber-500"
+                {...register("esCompensatorio")}
+              />
+              <div>
+                <span className="text-sm font-medium text-amber-800">T.E. compensatoria</span>
+                <p className="text-xs text-amber-600 mt-0.5">
+                  Marcá si la T.E. fue para no atrasar el proyecto (el operador absorbió el exceso). Si fue por sobrecarga, dejalo desmarcado.
+                </p>
+              </div>
+            </label>
+          )}
 
           {/* Notas */}
           <div className="space-y-1.5">

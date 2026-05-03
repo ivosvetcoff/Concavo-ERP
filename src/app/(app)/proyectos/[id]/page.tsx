@@ -16,6 +16,7 @@ import { TabCFDI } from "@/components/features/proyectos/detalle/TabCFDI";
 import { TabHistorial } from "@/components/features/proyectos/detalle/TabHistorial";
 import { TabProduccion } from "@/components/features/proyectos/detalle/TabProduccion";
 import { TabFinanzas } from "@/components/features/proyectos/detalle/TabFinanzas";
+import { TabPlanificacion } from "@/components/features/proyectos/detalle/TabPlanificacion";
 import {
   Tabs,
   TabsList,
@@ -71,6 +72,7 @@ export default async function ProyectoDetallePage({
             </TabsTrigger>
           )}
           <TabsTrigger value="produccion">Producción</TabsTrigger>
+          <TabsTrigger value="planificacion">Planificación</TabsTrigger>
           {owner && (
             <TabsTrigger value="finanzas">Finanzas</TabsTrigger>
           )}
@@ -103,6 +105,10 @@ export default async function ProyectoDetallePage({
 
         <TabsContent value="produccion" className="mt-4">
           <TabProduccionAsync proyectoId={proyecto.id} />
+        </TabsContent>
+
+        <TabsContent value="planificacion" className="mt-4">
+          <TabPlanificacion muebles={proyecto.muebles} proyectoId={proyecto.id} />
         </TabsContent>
 
         {owner && proyecto.montoVendido && (

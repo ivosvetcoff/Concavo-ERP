@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { estadoProyectoConfig, semaforoConfig } from "@/lib/status-colors";
 import { formatDate, formatMXN } from "@/lib/format";
-import { ArrowUpDown, CheckCircle2 } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 import Link from "next/link";
 
 export function getColumnasProyectos(isOwner: boolean): ColumnDef<ProyectoRow>[] {
@@ -48,14 +48,18 @@ export function getColumnasProyectos(isOwner: boolean): ColumnDef<ProyectoRow>[]
       accessorKey: "nombre",
       header: ({ column }) => (
         <Button variant="ghost" size="sm" className="-ml-3 h-8" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          NOMBRE <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
+          NOMBRE (P.O.) <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
         </Button>
       ),
-      cell: ({ row }) => (
-        <span className="text-gray-700 max-w-[200px] truncate block" title={row.original.nombre}>
-          {row.original.nombre}
-        </span>
-      ),
+      cell: ({ row }) => {
+        const { nombre, po } = row.original;
+        const label = po ? `${nombre} (${po})` : nombre;
+        return (
+          <span className="text-gray-700 max-w-[240px] truncate block" title={label}>
+            {label}
+          </span>
+        );
+      },
     },
     {
       accessorKey: "qtyItems",
@@ -72,17 +76,6 @@ export function getColumnasProyectos(isOwner: boolean): ColumnDef<ProyectoRow>[]
       ),
       cell: ({ row }) => (
         <span className="text-center block">{row.original.qtyItems}</span>
-      ),
-    },
-    {
-      accessorKey: "po",
-      header: ({ column }) => (
-        <Button variant="ghost" size="sm" className="-ml-3 h-8" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          P.O. <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
-        </Button>
-      ),
-      cell: ({ row }) => (
-        <span className="text-gray-500 text-sm">{row.original.po ?? "—"}</span>
       ),
     },
     {
@@ -161,20 +154,6 @@ export function getColumnasProyectos(isOwner: boolean): ColumnDef<ProyectoRow>[]
           </Badge>
         );
       },
-    },
-    {
-      accessorKey: "tieneHC",
-      header: ({ column }) => (
-        <Button variant="ghost" size="sm" className="-ml-3 h-8" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-          HC <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
-        </Button>
-      ),
-      cell: ({ row }) =>
-        row.original.tieneHC ? (
-          <CheckCircle2 className="h-4 w-4 text-green-600 mx-auto" />
-        ) : (
-          <span className="text-gray-300 text-center block">—</span>
-        ),
     },
     ...(isOwner
       ? [

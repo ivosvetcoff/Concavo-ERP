@@ -2,7 +2,6 @@ import { z } from "zod";
 import {
   EstadoProyecto,
   Semaforo,
-  Moneda,
   MetodoPago,
 } from "@prisma/client";
 
@@ -19,8 +18,6 @@ export const crearProyectoSchema = z.object({
     .refine((v) => !isNaN(parseFloat(v)) && parseFloat(v) >= 0, {
       message: "Monto inválido",
     }),
-  moneda: z.nativeEnum(Moneda).default("MXN"),
-  tieneHC: z.boolean().default(false),
   comentarios: z.string().max(500).optional().or(z.literal("")),
 });
 

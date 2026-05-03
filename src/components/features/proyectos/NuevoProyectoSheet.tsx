@@ -15,7 +15,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -46,19 +45,14 @@ export function NuevoProyectoSheet({ clientes, isOwner }: Props) {
     register,
     handleSubmit,
     setValue,
-    watch,
     reset,
     formState: { errors },
   } = useForm<CrearProyectoInput>({
     resolver: zodResolver(crearProyectoSchema),
     defaultValues: {
       estado: "COTIZACION",
-      moneda: "MXN",
-      tieneHC: false,
     },
   });
-
-  const tieneHC = watch("tieneHC");
 
   async function onSubmit(data: CrearProyectoInput) {
     setLoading(true);
@@ -172,73 +166,37 @@ export function NuevoProyectoSheet({ clientes, isOwner }: Props) {
               </div>
 
               {isOwner && (
-                <>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="montoVendido">
-                      Monto vendido (MXN) <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="montoVendido"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      placeholder="0.00"
-                      {...register("montoVendido")}
-                    />
-                    {errors.montoVendido && (
-                      <p className="text-xs text-red-500">{errors.montoVendido.message}</p>
-                    )}
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>Moneda</Label>
-                    <Select
-                      defaultValue="MXN"
-                      onValueChange={(v) => setValue("moneda", String(v) as "MXN" | "USD")}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="MXN">MXN — Peso mexicano</SelectItem>
-                        <SelectItem value="USD">USD — Dólar</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </>
+                <div className="space-y-1.5">
+                  <Label htmlFor="montoVendido">
+                    Monto vendido (MXN) <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="montoVendido"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                    {...register("montoVendido")}
+                  />
+                  {errors.montoVendido && (
+                    <p className="text-xs text-red-500">{errors.montoVendido.message}</p>
+                  )}
+                </div>
               )}
             </div>
           </div>
 
           <Separator />
 
-          {/* Fila Inferior: Detalles adicionales */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between rounded-lg border p-4">
-                <div className="space-y-0.5">
-                  <Label htmlFor="tieneHC" className="text-base">Tiene Hoja de Control</Label>
-                  <p className="text-xs text-muted-foreground">
-                    ¿Ya está armada la HC para este proyecto?
-                  </p>
-                </div>
-                <Switch
-                  id="tieneHC"
-                  checked={tieneHC}
-                  onCheckedChange={(v) => setValue("tieneHC", v)}
-                />
-              </div>
-            </div>
-            
-            <div className="space-y-1.5">
-              <Label htmlFor="comentarios">Comentarios</Label>
-              <textarea
-                id="comentarios"
-                placeholder="Notas internas sobre el proyecto…"
-                rows={3}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
-                {...register("comentarios")}
-              />
-            </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="comentarios">Comentarios</Label>
+            <textarea
+              id="comentarios"
+              placeholder="Notas internas sobre el proyecto…"
+              rows={3}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+              {...register("comentarios")}
+            />
           </div>
 
           <div className="flex justify-end gap-3 pt-2">
