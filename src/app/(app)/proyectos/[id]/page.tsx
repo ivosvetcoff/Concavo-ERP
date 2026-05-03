@@ -26,6 +26,7 @@ import {
 import { ChevronLeft } from "lucide-react";
 import { db } from "@/lib/db";
 import Decimal from "decimal.js";
+import { obtenerPlanProyecto } from "@/server/queries/gantt-plan";
 
 export default async function ProyectoDetallePage({
   params,
@@ -108,7 +109,7 @@ export default async function ProyectoDetallePage({
         </TabsContent>
 
         <TabsContent value="planificacion" className="mt-4">
-          <TabPlanificacion muebles={proyecto.muebles} proyectoId={proyecto.id} />
+          <TabPlanificacionAsync proyectoId={proyecto.id} />
         </TabsContent>
 
         {owner && proyecto.montoVendido && (
@@ -139,6 +140,11 @@ export default async function ProyectoDetallePage({
 }
 
 // ─── Async Server Component wrappers ─────────────────────────────────────────
+
+async function TabPlanificacionAsync({ proyectoId }: { proyectoId: string }) {
+  const planData = await obtenerPlanProyecto(proyectoId);
+  return <TabPlanificacion proyectoId={proyectoId} planData={planData} />;
+}
 
 async function TabProduccionAsync({ proyectoId }: { proyectoId: string }) {
   const registros = await obtenerRegistrosProyecto(proyectoId);

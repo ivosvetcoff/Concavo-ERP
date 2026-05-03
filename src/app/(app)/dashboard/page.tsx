@@ -5,10 +5,12 @@ import { KanbanProyectos } from "@/components/features/dashboard/KanbanProyectos
 import { GraficoEstados } from "@/components/features/dashboard/GraficoEstados";
 import { GraficoProcesos } from "@/components/features/dashboard/GraficoProcesos";
 import { AlertasDashboard } from "@/components/features/dashboard/AlertasDashboard";
+import { AlertasGantt } from "@/components/features/dashboard/AlertasGantt";
 import { addMonths, subMonths, format } from "date-fns";
 import { es } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { Suspense } from "react";
 
 export default async function DashboardPage({
   searchParams,
@@ -75,6 +77,11 @@ export default async function DashboardPage({
 
       {/* Alertas */}
       <AlertasDashboard alertas={dashboard.alertas} />
+
+      {/* Alertas Gantt (async — no bloquea carga principal) */}
+      <Suspense fallback={null}>
+        <AlertasGantt />
+      </Suspense>
 
       {/* Kanban */}
       <KanbanProyectos kanban={dashboard.kanban} />

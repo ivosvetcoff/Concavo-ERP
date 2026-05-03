@@ -3,7 +3,9 @@ import Link from "next/link";
 import { isOwner } from "@/lib/auth";
 import { getMondayOf } from "@/server/queries/produccion";
 import { obtenerOcupacionSemanas } from "@/server/queries/nomina-gantt";
+import { obtenerPlanTaller } from "@/server/queries/gantt-plan";
 import { ReporteOcupacion } from "@/components/features/ocupacion/ReporteOcupacion";
+import { ProyeccionOcupacion } from "@/components/features/ocupacion/ProyeccionOcupacion";
 import { addDays, subDays, format } from "date-fns";
 import { es } from "date-fns/locale";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -23,12 +25,14 @@ export default async function OcupacionPage({
   const semanaActual = getMondayOf(semanaRaw);
   const semanaStr = format(semanaActual, "yyyy-MM-dd");
 
-  // Obtener las últimas N semanas (incluida la actual)
   const semanasParaCargar = Array.from({ length: SEMANAS_HISTORICO }, (_, i) =>
     subDays(semanaActual, i * 7)
   ).reverse();
 
-  const semanas = await obtenerOcupacionSemanas(semanasParaCargar);
+  const [semanas, planTaller] = await Promise.all([
+    obtenerOcupacionSemanas(semanasParaCargar),
+    obtenerPlanTaller(),
+  ]);
 
   const semanaAnterior = format(subDays(semanaActual, 7), "yyyy-MM-dd");
   const semanaSiguiente = format(addDays(semanaActual, 7), "yyyy-MM-dd");
@@ -73,7 +77,11 @@ export default async function OcupacionPage({
         </div>
       </div>
 
+      {/* Reporte histórico (real: basado en registros de producción) */}
       <ReporteOcupacion semanas={semanas} semanaActual={semanaStr} />
+
+      {/* Proyección y simulador (basados en plan automático) */}
+      <ProyeccionOcupacion planTaller={planTaller} />
     </div>
   );
 }
