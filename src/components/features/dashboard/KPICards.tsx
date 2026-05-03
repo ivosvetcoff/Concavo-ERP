@@ -1,5 +1,7 @@
 import { formatMXN } from "@/lib/format";
 import type { DashboardKPIs } from "@/server/queries/dashboard";
+import { MontoPrivado } from "@/components/privacy/MontoPrivado";
+import type { ReactNode } from "react";
 
 type Props = {
   kpis: DashboardKPIs;
@@ -11,15 +13,22 @@ export function KPICards({ kpis, isOwner, mesLabel }: Props) {
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden h-full flex flex-col divide-y divide-gray-100">
       <StatBlock
-        value={formatMXN(kpis.totalComprasMes)}
+        value={<MontoPrivado>{formatMXN(kpis.totalComprasMes)}</MontoPrivado>}
         label="Compras del mes"
         sub={`${kpis.comprasMes} ${kpis.comprasMes === 1 ? "orden" : "órdenes"} · ${mesLabel}`}
       />
       {isOwner ? (
         <StatBlock
-          value={formatMXN(kpis.ingresosTotalesMes)}
+          value={<MontoPrivado>{formatMXN(kpis.ingresosTotalesMes)}</MontoPrivado>}
           label="Ingresos del mes"
-          sub={`${formatMXN(kpis.ingresosFacturadosMes)} fact. · ${formatMXN(kpis.ingresosEfectivoMes)} efect.`}
+          sub={
+            <>
+              <MontoPrivado>{formatMXN(kpis.ingresosFacturadosMes)}</MontoPrivado>
+              {" fact. · "}
+              <MontoPrivado>{formatMXN(kpis.ingresosEfectivoMes)}</MontoPrivado>
+              {" efect."}
+            </>
+          }
         />
       ) : (
         <div className="flex-1" />
@@ -33,9 +42,9 @@ function StatBlock({
   label,
   sub,
 }: {
-  value: string;
+  value: ReactNode;
   label: string;
-  sub: string;
+  sub: ReactNode;
 }) {
   return (
     <div className="px-5 py-6 flex-1 flex flex-col justify-center">

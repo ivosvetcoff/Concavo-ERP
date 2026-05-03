@@ -71,7 +71,7 @@ function AnticipoSheet({
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, reset, watch, formState: { errors } } =
+  const { register, handleSubmit, reset, watch, setValue, formState: { errors } } =
     useForm<AnticipoFormValues>({
       resolver: zodResolver(anticipoFormSchema),
       defaultValues: { cfdiEmitido: false },
@@ -79,11 +79,19 @@ function AnticipoSheet({
 
   const monto = watch("monto");
   const cfdiEmitido = watch("cfdiEmitido");
+  const metodoPago = watch("metodoPago");
 
   const porcentajeCalc =
     monto && parseFloat(monto) > 0 && parseFloat(montoProyecto) > 0
       ? ((parseFloat(monto) / parseFloat(montoProyecto)) * 100).toFixed(1)
       : null;
+
+  // Sugerir CFDI según método: digital → sí, efectivo → no
+  useEffect(() => {
+    if (!metodoPago) return;
+    const esDigital = ["TC ", "TD ", "TRANS."].some((p) => metodoPago.startsWith(p));
+    setValue("cfdiEmitido", esDigital);
+  }, [metodoPago, setValue]);
 
   useEffect(() => {
     if (open) reset({ fecha: new Date().toISOString().split("T")[0], cfdiEmitido: false });
@@ -150,9 +158,17 @@ function AnticipoSheet({
             {errors.metodoPago && <p className="text-xs text-red-500">{errors.metodoPago.message}</p>}
           </div>
 
-          <div className="flex items-center gap-2">
-            <input id="ant-cfdi" type="checkbox" {...register("cfdiEmitido")} className="rounded border-gray-300" />
-            <Label htmlFor="ant-cfdi" className="cursor-pointer font-normal">CFDI emitido</Label>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <input id="ant-cfdi" type="checkbox" {...register("cfdiEmitido")} className="rounded border-gray-300" />
+              <Label htmlFor="ant-cfdi" className="cursor-pointer font-normal">CFDI emitido</Label>
+            </div>
+            {metodoPago === "EFECTIVO" && (
+              <p className="text-xs text-gray-400 pl-6">Efectivo → CFDI no aplica</p>
+            )}
+            {metodoPago && metodoPago !== "EFECTIVO" && (
+              <p className="text-xs text-indigo-400 pl-6">Pago digital → se recomienda emitir CFDI</p>
+            )}
           </div>
 
           {cfdiEmitido && (
@@ -195,13 +211,21 @@ function PagoSheet({ proyectoId }: { proyectoId: string }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, reset, watch, formState: { errors } } =
+  const { register, handleSubmit, reset, watch, setValue: setValuePago, formState: { errors } } =
     useForm<PagoFormValues>({
       resolver: zodResolver(pagoFormSchema),
       defaultValues: { cfdiEmitido: false, estatus: "PENDIENTE" },
     });
 
   const cfdiEmitido = watch("cfdiEmitido");
+  const metodoPagoPago = watch("metodoPago");
+
+  // Sugerir CFDI según método: digital → sí, efectivo → no
+  useEffect(() => {
+    if (!metodoPagoPago) return;
+    const esDigital = ["TC ", "TD ", "TRANS."].some((p) => metodoPagoPago.startsWith(p));
+    setValuePago("cfdiEmitido", esDigital);
+  }, [metodoPagoPago, setValuePago]);
 
   useEffect(() => {
     if (open) reset({ fecha: new Date().toISOString().split("T")[0], cfdiEmitido: false, estatus: "PENDIENTE" });
@@ -280,9 +304,17 @@ function PagoSheet({ proyectoId }: { proyectoId: string }) {
             </select>
           </div>
 
-          <div className="flex items-center gap-2">
-            <input id="pago-cfdi" type="checkbox" {...register("cfdiEmitido")} className="rounded border-gray-300" />
-            <Label htmlFor="pago-cfdi" className="cursor-pointer font-normal">CFDI emitido</Label>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <input id="pago-cfdi" type="checkbox" {...register("cfdiEmitido")} className="rounded border-gray-300" />
+              <Label htmlFor="pago-cfdi" className="cursor-pointer font-normal">CFDI emitido</Label>
+            </div>
+            {metodoPagoPago === "EFECTIVO" && (
+              <p className="text-xs text-gray-400 pl-6">Efectivo → CFDI no aplica</p>
+            )}
+            {metodoPagoPago && metodoPagoPago !== "EFECTIVO" && (
+              <p className="text-xs text-indigo-400 pl-6">Pago digital → se recomienda emitir CFDI</p>
+            )}
           </div>
 
           {cfdiEmitido && (

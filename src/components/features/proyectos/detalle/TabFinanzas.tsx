@@ -2,6 +2,7 @@
 
 import { TrendingUp, TrendingDown, Info } from "lucide-react";
 import { formatMXN } from "@/lib/format";
+import { MontoPrivado } from "@/components/privacy/MontoPrivado";
 import type { MODetalleEmpleado } from "@/server/queries/proyecto-finanzas";
 import type { ProcesoTecnico } from "@prisma/client";
 
@@ -61,17 +62,19 @@ function LineItem({
         </span>
         {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
       </div>
-      <span
-        className={`tabular-nums ${
-          negativo
-            ? "text-red-600"
-            : highlight
-            ? "text-gray-900"
-            : "text-gray-700"
-        }`}
-      >
-        {value}
-      </span>
+      <MontoPrivado>
+        <span
+          className={`tabular-nums ${
+            negativo
+              ? "text-red-600"
+              : highlight
+              ? "text-gray-900"
+              : "text-gray-700"
+          }`}
+        >
+          {value}
+        </span>
+      </MontoPrivado>
     </div>
   );
 }
@@ -215,13 +218,15 @@ export function TabFinanzas({
                 <TrendingDown className="h-5 w-5 text-red-500 flex-shrink-0" />
               )}
               <div>
-                <p
-                  className={`text-lg font-bold tabular-nums ${
-                    utilidadPos ? "text-emerald-700" : "text-red-700"
-                  }`}
-                >
-                  {formatMXN(finanzas.utilidad)}
-                </p>
+                <MontoPrivado>
+                  <p
+                    className={`text-lg font-bold tabular-nums ${
+                      utilidadPos ? "text-emerald-700" : "text-red-700"
+                    }`}
+                  >
+                    {formatMXN(finanzas.utilidad)}
+                  </p>
+                </MontoPrivado>
                 <p className="text-xs text-gray-500">
                   {parseFloat(finanzas.utilidadSobreVentaPct).toFixed(1)}% sobre venta
                 </p>
@@ -269,17 +274,21 @@ export function TabFinanzas({
                     {PROCESO_LABELS[m.proceso] ?? m.proceso}
                   </td>
                   <td className="py-2 px-3 text-center tabular-nums text-gray-700">
-                    {parseFloat(m.horasTO) > 0
-                      ? `${parseFloat(m.horasTO) % 1 === 0 ? parseFloat(m.horasTO) : parseFloat(m.horasTO).toFixed(1)}h × ${formatMXN(m.tarifaTO)}`
-                      : <span className="text-gray-300">—</span>}
+                    {parseFloat(m.horasTO) > 0 ? (
+                      <MontoPrivado>
+                        {`${parseFloat(m.horasTO) % 1 === 0 ? parseFloat(m.horasTO) : parseFloat(m.horasTO).toFixed(1)}h × ${formatMXN(m.tarifaTO)}`}
+                      </MontoPrivado>
+                    ) : <span className="text-gray-300">—</span>}
                   </td>
                   <td className="py-2 px-3 text-center tabular-nums text-amber-600">
-                    {parseFloat(m.horasTE) > 0
-                      ? `${parseFloat(m.horasTE) % 1 === 0 ? parseFloat(m.horasTE) : parseFloat(m.horasTE).toFixed(1)}h × ${formatMXN(m.tarifaTE)}`
-                      : <span className="text-gray-300">—</span>}
+                    {parseFloat(m.horasTE) > 0 ? (
+                      <MontoPrivado>
+                        {`${parseFloat(m.horasTE) % 1 === 0 ? parseFloat(m.horasTE) : parseFloat(m.horasTE).toFixed(1)}h × ${formatMXN(m.tarifaTE)}`}
+                      </MontoPrivado>
+                    ) : <span className="text-gray-300">—</span>}
                   </td>
                   <td className="py-2 px-4 text-right font-medium tabular-nums">
-                    {formatMXN(m.costoTotal)}
+                    <MontoPrivado>{formatMXN(m.costoTotal)}</MontoPrivado>
                   </td>
                 </tr>
               ))}
@@ -290,11 +299,13 @@ export function TabFinanzas({
                   Total M.O. directa
                 </td>
                 <td className="py-2 px-4 text-right font-semibold tabular-nums">
-                  {formatMXN(
-                    moDetalle
-                      .reduce((s, m) => s + parseFloat(m.costoTotal), 0)
-                      .toFixed(2)
-                  )}
+                  <MontoPrivado>
+                    {formatMXN(
+                      moDetalle
+                        .reduce((s, m) => s + parseFloat(m.costoTotal), 0)
+                        .toFixed(2)
+                    )}
+                  </MontoPrivado>
                 </td>
               </tr>
             </tfoot>

@@ -18,7 +18,10 @@ import {
   ClipboardList,
   Activity,
   HeartPulse,
+  Eye,
+  EyeOff,
 } from "lucide-react";
+import { usePrivacidadMontos } from "@/lib/privacy";
 
 
 const navItems = [
@@ -43,6 +46,7 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { privacidad, togglePrivacidad } = usePrivacidadMontos();
 
   return (
     <aside className="w-56 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col">
@@ -72,7 +76,32 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="px-2 pb-2">
+      <div className="px-2 pb-1 space-y-0.5">
+        {/* Toggle modo privacidad */}
+        <button
+          onClick={togglePrivacidad}
+          title={privacidad ? "Mostrar montos (⌘⇧P)" : "Ocultar montos (⌘⇧P)"}
+          className={cn(
+            "w-full flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors",
+            privacidad
+              ? "bg-amber-50 text-amber-700 hover:bg-amber-100"
+              : "text-gray-400 hover:bg-gray-50 hover:text-gray-600"
+          )}
+        >
+          {privacidad ? (
+            <EyeOff className="h-4 w-4 flex-shrink-0" />
+          ) : (
+            <Eye className="h-4 w-4 flex-shrink-0" />
+          )}
+          <span className="flex-1 text-left text-xs">
+            {privacidad ? "Montos ocultos" : "Ocultar montos"}
+          </span>
+          <kbd className="text-[10px] bg-gray-100 rounded px-1.5 py-0.5 font-mono">
+            ⌘⇧P
+          </kbd>
+        </button>
+
+        {/* Buscar */}
         <button
           onClick={() =>
             document.dispatchEvent(

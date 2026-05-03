@@ -218,18 +218,28 @@ export function CompraSheet({ proyectos, proyectoIdDefault, onSuccess }: Props) 
 
           {/* Proyecto */}
           <div className="space-y-1.5">
-            <Label>Proyecto</Label>
+            <Label>
+              Proyecto <span className="text-red-500">*</span>
+            </Label>
             <select
               {...register("proyectoId")}
               className="w-full text-sm border border-gray-200 rounded-md px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-indigo-300"
             >
-              <option value="">Sin asignar / Por asignar</option>
+              <option value="">Seleccionar proyecto…</option>
               {proyectos.map((p) => (
                 <option key={p.id} value={p.id}>
                   #{p.codigo} — {p.nombre}
                 </option>
               ))}
+              <option value="" style={{ color: "#9ca3af" }}>
+                — Sin asignar (no recomendado) —
+              </option>
             </select>
+            {!watch("proyectoId") && (
+              <p className="text-xs text-amber-600">
+                Toda compra debería tener un proyecto asignado.
+              </p>
+            )}
           </div>
 
           {/* Descripción */}

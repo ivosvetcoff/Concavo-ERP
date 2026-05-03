@@ -28,6 +28,7 @@ import { cambiarEstadoProyecto, ajustarMonto } from "@/server/actions/proyectos"
 import { Pencil, Calendar, DollarSign } from "lucide-react";
 import type { ProyectoDetalle } from "@/server/queries/proyecto-detalle";
 import type { EstadoProyecto } from "@prisma/client";
+import { MontoPrivado } from "@/components/privacy/MontoPrivado";
 
 type Props = {
   proyecto: ProyectoDetalle;
@@ -144,7 +145,7 @@ export function HeaderProyecto({ proyecto, isOwner }: Props) {
                   <div className="space-y-1.5">
                     <Label>Monto actual</Label>
                     <p className="text-sm font-mono text-gray-600">
-                      {formatMXN((proyecto.montoVendido ?? 0).toString())}
+                      <MontoPrivado>{formatMXN((proyecto.montoVendido ?? 0).toString())}</MontoPrivado>
                     </p>
                   </div>
                   <div className="space-y-1.5">
@@ -231,7 +232,7 @@ export function HeaderProyecto({ proyecto, isOwner }: Props) {
               <DollarSign className="h-3 w-3" /> Monto vendido
             </p>
             <p className="font-semibold text-base tabular-nums">
-              {formatMXN((proyecto.montoVendido ?? 0).toString())}
+              <MontoPrivado>{formatMXN((proyecto.montoVendido ?? 0).toString())}</MontoPrivado>
             </p>
           </div>
         )}

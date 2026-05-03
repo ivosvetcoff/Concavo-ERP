@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatMXN, formatDate } from "@/lib/format";
 import { cerrarMes } from "@/server/actions/cierre";
+import { MontoPrivado } from "@/components/privacy/MontoPrivado";
 
 export type ProyectoCalculado = {
   id: string;
@@ -113,15 +114,17 @@ function FilaProyecto({ p }: { p: ProyectoCalculado }) {
         </td>
         <td className="py-2.5 px-3 text-center text-xs text-gray-500">{p.qtyItems}</td>
         <td className="py-2.5 px-3 text-right font-medium tabular-nums">
-          {formatMXN(p.montoVendido)}
+          <MontoPrivado>{formatMXN(p.montoVendido)}</MontoPrivado>
         </td>
         <td className="py-2.5 px-3 text-right tabular-nums text-gray-600">
-          {formatMXN(p.costoProyecto)}
+          <MontoPrivado>{formatMXN(p.costoProyecto)}</MontoPrivado>
         </td>
         <td className="py-2.5 px-3 text-right font-semibold tabular-nums">
-          <span className={utilPos ? "text-emerald-700" : "text-red-600"}>
-            {formatMXN(p.utilidad)}
-          </span>
+          <MontoPrivado>
+            <span className={utilPos ? "text-emerald-700" : "text-red-600"}>
+              {formatMXN(p.utilidad)}
+            </span>
+          </MontoPrivado>
         </td>
         <td className="py-2.5 px-3 text-center">
           <UtilBadge pct={p.utilidadSobreVentaPct} />
@@ -135,24 +138,24 @@ function FilaProyecto({ p }: { p: ProyectoCalculado }) {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
               <div>
                 <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Material directo</p>
-                <p className="font-medium tabular-nums">{formatMXN(p.materialDirecto)}</p>
+                <p className="font-medium tabular-nums"><MontoPrivado>{formatMXN(p.materialDirecto)}</MontoPrivado></p>
               </div>
               <div>
                 <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Prop. insumos</p>
-                <p className="font-medium tabular-nums">{formatMXN(p.proporcionalInsumos)}</p>
+                <p className="font-medium tabular-nums"><MontoPrivado>{formatMXN(p.proporcionalInsumos)}</MontoPrivado></p>
               </div>
               <div>
                 <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Prop. M.O.I.</p>
-                <p className="font-medium tabular-nums">{formatMXN(p.proporcionalMOI)}</p>
+                <p className="font-medium tabular-nums"><MontoPrivado>{formatMXN(p.proporcionalMOI)}</MontoPrivado></p>
               </div>
               <div>
                 <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">M.O. directa</p>
-                <p className="font-medium tabular-nums">{formatMXN(p.costoMODirecta)}</p>
+                <p className="font-medium tabular-nums"><MontoPrivado>{formatMXN(p.costoMODirecta)}</MontoPrivado></p>
               </div>
             </div>
             <div className="mt-2 pt-2 border-t border-gray-200 flex gap-6 text-xs text-gray-500">
               <span>
-                Costo total: <span className="font-semibold text-gray-700">{formatMXN(p.costoProyecto)}</span>
+                Costo total: <MontoPrivado><span className="font-semibold text-gray-700">{formatMXN(p.costoProyecto)}</span></MontoPrivado>
               </span>
               <span>
                 Utilidad sobre costo: <span className="font-semibold text-gray-700">{parseFloat(p.utilidadSobreCostoPct).toFixed(1)}%</span>
@@ -254,15 +257,15 @@ export function ResumenCierre({
                   <span className="text-gray-600 flex items-center gap-1.5">
                     <Receipt className="h-3.5 w-3.5 text-blue-500" />Facturado
                   </span>
-                  <span className="font-medium tabular-nums">{formatMXN(totalIngresosFacturado)}</span>
+                  <MontoPrivado><span className="font-medium tabular-nums">{formatMXN(totalIngresosFacturado)}</span></MontoPrivado>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Efectivo</span>
-                  <span className="font-medium tabular-nums">{formatMXN(totalIngresosEfectivo)}</span>
+                  <MontoPrivado><span className="font-medium tabular-nums">{formatMXN(totalIngresosEfectivo)}</span></MontoPrivado>
                 </div>
                 <div className="flex justify-between text-sm font-semibold border-t pt-1.5">
                   <span>Total ingresos</span>
-                  <span className="tabular-nums">{formatMXN(totalIngresos)}</span>
+                  <MontoPrivado><span className="tabular-nums">{formatMXN(totalIngresos)}</span></MontoPrivado>
                 </div>
               </div>
             </div>
@@ -273,15 +276,15 @@ export function ResumenCierre({
               <div className="space-y-1.5">
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Insumos generales</span>
-                  <span className="font-medium tabular-nums">{formatMXN(totalInsumos)}</span>
+                  <MontoPrivado><span className="font-medium tabular-nums">{formatMXN(totalInsumos)}</span></MontoPrivado>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">M.O. indirecta</span>
-                  <span className="font-medium tabular-nums">{formatMXN(totalMOI)}</span>
+                  <MontoPrivado><span className="font-medium tabular-nums">{formatMXN(totalMOI)}</span></MontoPrivado>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Gastos fijos</span>
-                  <span className="font-medium tabular-nums">{formatMXN(totalGastosFijos)}</span>
+                  <MontoPrivado><span className="font-medium tabular-nums">{formatMXN(totalGastosFijos)}</span></MontoPrivado>
                 </div>
               </div>
             </div>
@@ -293,9 +296,11 @@ export function ResumenCierre({
               <div>
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Utilidad neta del mes</p>
                 <div className="flex items-center gap-3">
-                  <p className={`text-3xl font-bold tabular-nums ${utilidadPos ? "text-emerald-700" : "text-red-700"}`}>
-                    {formatMXN(utilidadNetaMes)}
-                  </p>
+                  <MontoPrivado>
+                    <p className={`text-3xl font-bold tabular-nums ${utilidadPos ? "text-emerald-700" : "text-red-700"}`}>
+                      {formatMXN(utilidadNetaMes)}
+                    </p>
+                  </MontoPrivado>
                   {utilidadPos ? (
                     <TrendingUp className="h-6 w-6 text-emerald-500" />
                   ) : (
@@ -303,7 +308,7 @@ export function ResumenCierre({
                   )}
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
-                  Utilidad de proyectos {formatMXN(utilidadProyectosTotal)} − gastos fijos {formatMXN(totalGastosFijos)}
+                  Utilidad de proyectos <MontoPrivado>{formatMXN(utilidadProyectosTotal)}</MontoPrivado> − gastos fijos <MontoPrivado>{formatMXN(totalGastosFijos)}</MontoPrivado>
                 </p>
               </div>
 

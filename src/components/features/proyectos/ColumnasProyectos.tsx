@@ -8,6 +8,7 @@ import { estadoProyectoConfig, semaforoConfig } from "@/lib/status-colors";
 import { formatDate, formatMXN } from "@/lib/format";
 import { ArrowUpDown } from "lucide-react";
 import Link from "next/link";
+import { MontoPrivado } from "@/components/privacy/MontoPrivado";
 
 export function getColumnasProyectos(isOwner: boolean): ColumnDef<ProyectoRow>[] {
   return [
@@ -165,9 +166,11 @@ export function getColumnasProyectos(isOwner: boolean): ColumnDef<ProyectoRow>[]
               </Button>
             ),
             cell: ({ row }: { row: { original: ProyectoRow } }) => (
-              <span className="tabular-nums font-medium">
-                {formatMXN(row.original.montoVendido)}
-              </span>
+              <MontoPrivado>
+                <span className="tabular-nums font-medium">
+                  {formatMXN(row.original.montoVendido)}
+                </span>
+              </MontoPrivado>
             ),
           },
           {

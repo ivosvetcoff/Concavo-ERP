@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Save, CheckCircle2 } from "lucide-react";
+import { MontoPrivado } from "@/components/privacy/MontoPrivado";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatMXN } from "@/lib/format";
@@ -77,6 +78,15 @@ export function GastosFijosForm({
 
   return (
     <div className="space-y-4">
+      {/* Botón guardar al tope para encontrarlo rápido */}
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-gray-400">Ingresá los montos y marcá los pagados.</p>
+        <Button onClick={handleGuardar} disabled={loading} className="gap-2">
+          <Save className="h-4 w-4" />
+          {loading ? "Guardando…" : "Guardar mes"}
+        </Button>
+      </div>
+
       <div className="rounded-md border bg-white overflow-hidden">
         <table className="w-full text-sm">
           <thead>
@@ -148,7 +158,7 @@ export function GastosFijosForm({
                 Total gastos fijos
               </td>
               <td className="py-3 px-4 font-semibold tabular-nums text-gray-900">
-                {formatMXN(totalIngresado.toFixed(2))}
+                <MontoPrivado>{formatMXN(totalIngresado.toFixed(2))}</MontoPrivado>
               </td>
               <td className="py-3 px-4 text-center">
                 {!hayPendientes && totalIngresado.gt(0) && (
